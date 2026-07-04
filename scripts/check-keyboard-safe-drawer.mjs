@@ -12,6 +12,10 @@ const modalWrapper = fs.readFileSync(
   "utf8"
 );
 const modalCss = fs.readFileSync("src/css/Modal/Modal.css", "utf8");
+const selectMenuComponent = fs.readFileSync(
+  "src/core/react/components/UI/Menus/menu/SelectMenuComponent.tsx",
+  "utf8"
+);
 
 const checks = [
   {
@@ -96,6 +100,13 @@ const checks = [
       /\.mk-drawer-content\.mk-drawer-modal[\s\S]*--mk-visual-viewport-height/.test(
         menuCss
       ),
+  },
+  {
+    name: "mobile select menus render options before drawer enter transition",
+    pass:
+      /useState<SelectOption\[\]>\(\(\) =>\s*getOptions\(props, query, section\)/.test(
+        selectMenuComponent
+      ) && !/useState<SelectOption\[\]>\(\[\]\)/.test(selectMenuComponent),
   },
 ];
 

@@ -191,7 +191,6 @@ function getOptions(
 const SelectMenuComponent = React.forwardRef(
   (_props: SelectMenuComponentProps, ref: any) => {
     const props = { ...defaultProps, ..._props };
-    const [options, setOptions] = useState<SelectOption[]>([]);
     const refs = useRef<HTMLDivElement[]>([]);
     const sections: SelectSection[] = useMemo(() => {
       if (!props.showSections) return [];
@@ -207,6 +206,9 @@ const SelectMenuComponent = React.forwardRef(
     const inputRef = useRef(null);
     const [section, setSection] = useState("");
     const [query, setQuery] = useState("");
+    const [options, setOptions] = useState<SelectOption[]>(() =>
+      getOptions(props, query, section)
+    );
     const [focused, setFocused] = useState(false);
     const [index, setIndex] = useState(0);
     const onComposition = useRef(false);
