@@ -42,6 +42,7 @@ export const showModal = (props: {
           fc={props.fc}
           hide={() => hide()}
           newProps={newProps}
+          scaleBackground={false}
           className={`${
             props.isPalette ? "mk-drawer-palette" : "mk-drawer-modal"
           } ${props.className ? props.className : ""}`}

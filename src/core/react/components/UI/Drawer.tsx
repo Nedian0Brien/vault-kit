@@ -7,6 +7,7 @@ export const MobileDrawer = (props: {
   hide: (suppress: boolean) => void;
   className: string;
   newProps: any;
+  scaleBackground?: boolean;
 }) => {
   const { newProps } = props;
   const [open, setOpen] = React.useState(true);
@@ -62,7 +63,7 @@ export const MobileDrawer = (props: {
       onOpenChange={(isOpen) => {
         setOpen(isOpen);
       }}
-      shouldScaleBackground
+      shouldScaleBackground={props.scaleBackground ?? true}
       onClose={() => {
         setOpen(false);
         props.hide(true);

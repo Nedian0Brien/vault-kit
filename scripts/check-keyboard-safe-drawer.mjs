@@ -6,6 +6,7 @@ const inputModal = fs.readFileSync(
   "src/core/react/components/UI/Modals/InputModal.tsx",
   "utf8"
 );
+const modal = fs.readFileSync("src/adapters/obsidian/ui/modal.tsx", "utf8");
 
 const checks = [
   {
@@ -23,6 +24,15 @@ const checks = [
   {
     name: "MobileDrawer does not shrink compact drawers with Vaul fixed mode",
     pass: !/<Drawer\.Root[\s\S]*\bfixed\b[\s\S]*>/.test(drawer),
+  },
+  {
+    name: "MobileDrawer can disable background scaling",
+    pass: drawer.includes("scaleBackground?: boolean") &&
+      drawer.includes("shouldScaleBackground={props.scaleBackground ?? true}"),
+  },
+  {
+    name: "mobile modals do not scale the Obsidian app container",
+    pass: /<MobileDrawer[\s\S]*scaleBackground={false}/.test(modal),
   },
   {
     name: "InputModal delays mobile autofocus",
