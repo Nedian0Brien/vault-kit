@@ -103,6 +103,7 @@ body.is-mobile {
     calc(50px - var(--mk-keyboard-inset-bottom, 0px))
   );
   margin-bottom: var(--mk-drawer-modal-bottom);
+  bottom: var(--mk-keyboard-inset-bottom, 0px);
   max-height: min(96%, calc(var(--mk-visual-viewport-height, 100vh) - 24px));
   border-radius: 8px;
 }

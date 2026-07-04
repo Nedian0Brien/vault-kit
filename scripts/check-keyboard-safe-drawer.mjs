@@ -50,6 +50,13 @@ const checks = [
       ),
   },
   {
+    name: "mobile drawer modal follows keyboard inset from the bottom",
+    pass:
+      /\.mk-drawer-content\.mk-drawer-modal[\s\S]*bottom:\s*var\(--mk-keyboard-inset-bottom/.test(
+        menuCss
+      ),
+  },
+  {
     name: "mobile drawer modal caps height to visual viewport",
     pass:
       /\.mk-drawer-content\.mk-drawer-modal[\s\S]*--mk-visual-viewport-height/.test(
