@@ -67,6 +67,7 @@ export const MobileDrawer = (props: {
         setOpen(false);
         props.hide(true);
       }}
+      fixed
       noBodyStyles
     >
       <Drawer.Portal>

@@ -2,6 +2,10 @@ import fs from "node:fs";
 
 const drawer = fs.readFileSync("src/core/react/components/UI/Drawer.tsx", "utf8");
 const menuCss = fs.readFileSync("src/css/Menus/Menu.css", "utf8");
+const inputModal = fs.readFileSync(
+  "src/core/react/components/UI/Modals/InputModal.tsx",
+  "utf8"
+);
 
 const checks = [
   {
@@ -17,11 +21,22 @@ const checks = [
     pass: drawer.includes('addEventListener("resize"'),
   },
   {
-    name: "mobile drawer modal uses keyboard inset token",
-    pass:
-      /\.mk-drawer-content\.mk-drawer-modal[\s\S]*--mk-keyboard-inset-bottom/.test(
-        menuCss
-      ),
+    name: "MobileDrawer uses Vaul fixed keyboard behavior",
+    pass: /<Drawer\.Root[\s\S]*\bfixed\b/.test(drawer),
+  },
+  {
+    name: "InputModal delays mobile autofocus",
+    pass: inputModal.includes("focusDelay") && inputModal.includes("is-mobile"),
+  },
+  {
+    name: "InputModal focuses without forced scroll",
+    pass: inputModal.includes("preventScroll: true"),
+  },
+  {
+    name: "mobile drawer modal preserves closed-keyboard spacing",
+    pass: /\.mk-drawer-content\.mk-drawer-modal[\s\S]*margin-bottom:\s*50px/.test(
+      menuCss
+    ),
   },
   {
     name: "mobile drawer modal caps height to visual viewport",

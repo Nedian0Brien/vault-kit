@@ -31,12 +31,23 @@ export const InputModal = (props: {
     props.saveValue(value);
     if (props.hide) props.hide();
   };
-  const ref = useRef(null);
+  const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (ref?.current) {
-      ref.current.focus();
-    }
-  }, [ref]);
+    const input = ref.current;
+    if (!input) return;
+
+    const doc = input.ownerDocument;
+    const win = doc.defaultView ?? window;
+    const shouldDelayFocus =
+      doc.body.classList.contains("is-mobile") ||
+      doc.body.classList.contains("is-phone");
+    const focusDelay = shouldDelayFocus ? 350 : 0;
+    const focusTimer = win.setTimeout(() => {
+      input.focus({ preventScroll: true });
+    }, focusDelay);
+
+    return () => win.clearTimeout(focusTimer);
+  }, []);
   return (
     <div className="mk-layout-column mk-gap-8">
       <input
