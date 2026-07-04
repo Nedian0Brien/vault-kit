@@ -7,6 +7,11 @@ const inputModal = fs.readFileSync(
   "utf8"
 );
 const modal = fs.readFileSync("src/adapters/obsidian/ui/modal.tsx", "utf8");
+const modalWrapper = fs.readFileSync(
+  "src/core/react/components/UI/Modals/modalWrapper.tsx",
+  "utf8"
+);
+const modalCss = fs.readFileSync("src/css/Modal/Modal.css", "utf8");
 
 const checks = [
   {
@@ -33,6 +38,27 @@ const checks = [
   {
     name: "mobile modals do not scale the Obsidian app container",
     pass: /<MobileDrawer[\s\S]*scaleBackground={false}/.test(modal),
+  },
+  {
+    name: "mobile input modals render as centered modal wrappers",
+    pass: /if \(!props\.isPalette\) {[\s\S]*root\.render\(renderModalWrapper/.test(
+      modal
+    ),
+  },
+  {
+    name: "centered mobile modal follows visual viewport",
+    pass:
+      modalWrapper.includes("--mk-visual-viewport-height") &&
+      /\.mk-modal-wrapper-mobile \.mk-modal-container[\s\S]*--mk-visual-viewport-height/.test(
+        modalCss
+      ),
+  },
+  {
+    name: "phone modal wrapper overrides bottom sheet sizing",
+    pass:
+      /\.is-phone \.mk-modal-wrapper-mobile \.mk-modal[\s\S]*bottom:\s*auto/.test(
+        modalCss
+      ),
   },
   {
     name: "InputModal delays mobile autofocus",

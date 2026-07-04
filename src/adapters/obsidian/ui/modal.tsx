@@ -35,8 +35,40 @@ export const showModal = (props: {
 
   const root = props.ui.createRoot(portalElement);
   const hide = hideFunction(root);
+  const isTouch = isTouchScreen(props.ui.manager);
+  const renderModalWrapper = (newProps: any) => (
+    <ModalWrapper
+      ui={props.ui.manager}
+      hide={() => hide()}
+      className={`${props.isPalette ? "mk-palette" : "mk-modal"} ${
+        props.className ? props.className : ""
+      }`}
+    >
+      {!props.isPalette && !isTouch && (
+        <div className="mk-modal-header">
+          {props.title && <div className="mk-modal-title">{props.title}</div>}
+          <div
+            className="mk-x-small"
+            dangerouslySetInnerHTML={{
+              __html: props.ui.getSticker("ui//close"),
+            }}
+            onClick={() => hide()}
+          ></div>
+        </div>
+      )}
+
+      {cloneElement(props.fc, {
+        hide: () => hide(),
+        ...newProps,
+      })}
+    </ModalWrapper>
+  );
   const updateRoot = (newProps: any) => {
-    if (isTouchScreen(props.ui.manager)) {
+    if (isTouch) {
+      if (!props.isPalette) {
+        root.render(renderModalWrapper(newProps));
+        return;
+      }
       root.render(
         <MobileDrawer
           fc={props.fc}
@@ -50,33 +82,7 @@ export const showModal = (props: {
       );
       return;
     }
-    root.render(
-      <ModalWrapper
-        ui={props.ui.manager}
-        hide={() => hide()}
-        className={`${props.isPalette ? "mk-palette" : "mk-modal"} ${
-          props.className ? props.className : ""
-        }`}
-      >
-        {!props.isPalette && (
-          <div className="mk-modal-header">
-            {props.title && <div className="mk-modal-title">{props.title}</div>}
-            <div
-              className="mk-x-small"
-              dangerouslySetInnerHTML={{
-                __html: props.ui.getSticker("ui//close"),
-              }}
-              onClick={() => hide()}
-            ></div>
-          </div>
-        )}
-
-        {cloneElement(props.fc, {
-          hide: () => hide(),
-          ...newProps,
-        })}
-      </ModalWrapper>
-    );
+    root.render(renderModalWrapper(newProps));
   };
   updateRoot(props.props);
   return {

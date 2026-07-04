@@ -9,6 +9,7 @@ export const ModalWrapper = (props: {
   children: any;
   className?: string;
 }) => {
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
   const { setNodeRef, isOver } = useDroppable({
     id: "_modal",
     data: { id: "_modal" },
@@ -21,9 +22,51 @@ export const ModalWrapper = (props: {
       }
     },
   });
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const win = container.ownerDocument.defaultView ?? window;
+    const viewport = win.visualViewport;
+    const updateViewportStyle = () => {
+      const height = Math.round(viewport?.height ?? win.innerHeight);
+      const offsetTop = Math.round(viewport?.offsetTop ?? 0);
+      const keyboardInset = Math.max(
+        0,
+        Math.round(win.innerHeight - height - offsetTop)
+      );
+
+      container.style.setProperty("--mk-visual-viewport-height", `${height}px`);
+      container.style.setProperty(
+        "--mk-visual-viewport-offset-top",
+        `${offsetTop}px`
+      );
+      container.style.setProperty(
+        "--mk-keyboard-inset-bottom",
+        `${keyboardInset}px`
+      );
+    };
+
+    updateViewportStyle();
+    viewport?.addEventListener("resize", updateViewportStyle);
+    viewport?.addEventListener("scroll", updateViewportStyle);
+    win.addEventListener("resize", updateViewportStyle);
+
+    return () => {
+      viewport?.removeEventListener("resize", updateViewportStyle);
+      viewport?.removeEventListener("scroll", updateViewportStyle);
+      win.removeEventListener("resize", updateViewportStyle);
+    };
+  }, []);
 
   return (
-    <div className={`mk-modal-container`} ref={setNodeRef}>
+    <div
+      className={`mk-modal-container`}
+      ref={(el) => {
+        setNodeRef(el);
+        containerRef.current = el;
+      }}
+    >
       <ModalInner ui={props.ui} hide={props.hide} className={props.className}>
         {props.children}
       </ModalInner>
