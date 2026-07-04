@@ -50,8 +50,7 @@ import {
   getAbstractFileAtPath,
   openTFile,
   openTFolder,
-  openTagContext,
-  openURL
+  openTagContext
 } from "adapters/obsidian/utils/file";
 import { replaceInlineContext } from "adapters/obsidian/utils/markdownPost";
 import { convertPathToSpace } from "core/superstate/utils/path";
@@ -353,10 +352,8 @@ loadViews () {
   }
   
   releaseTheNotes() {
-    openURL('https://www.make.md/static/latest.md', this.app, true)
   }
   getStarted() {
-    openURL('https://www.make.md/static/GetStarted.md', this.app, true)
   }
   closeExtraFileTabs () {
     let filesFound = false;
@@ -560,7 +557,7 @@ const settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 
     this.files = FilesystemMiddleware.create();
     this.obsidianAdapter = new ObsidianFileSystem(this, this.files, normalizePath(
-      this.app.vault.configDir + "/plugins/make-md/Spaces.mdb"
+      this.app.vault.configDir + "/plugins/vault-kit/Spaces.mdb"
     ))
     this.files.initiateFileSystemAdapter(this.obsidianAdapter, true);
 this.markdownAdapter = new ObsidianMarkdownFiletypeAdapter(this);
@@ -613,10 +610,10 @@ this.markdownAdapter = new ObsidianMarkdownFiletypeAdapter(this);
     
   let cachePersister : LocalCachePersister;
     if (Platform.isMobile) {
-      cachePersister = new MobileCachePersister('.makemd/superstate.mdc', this.mdbFileAdapter, ['path', 'space', 'frame', 'context', 'icon'])
+      cachePersister = new MobileCachePersister('.vaultkit/superstate.mdc', this.mdbFileAdapter, ['path', 'space', 'frame', 'context', 'icon'])
     } else {
-      // cachePersister = new MobileCachePersister('.makemd/superstate.mdc', this.mdbFileAdapter, ['path', 'space', 'frame', 'context', 'icon'])
-      cachePersister = new LocalStorageCache('.makemd/superstate.mdc', this.mdbFileAdapter, ['path', 'space', 'frame', 'context', 'icon'])
+      // cachePersister = new MobileCachePersister('.vaultkit/superstate.mdc', this.mdbFileAdapter, ['path', 'space', 'frame', 'context', 'icon'])
+      cachePersister = new LocalStorageCache('.vaultkit/superstate.mdc', this.mdbFileAdapter, ['path', 'space', 'frame', 'context', 'icon'])
     }
     if (this.superstate.settings.cacheIndex) {
     await cachePersister.initialize()
@@ -651,7 +648,7 @@ this.markdownAdapter = new ObsidianMarkdownFiletypeAdapter(this);
     this.loadCommands();
     
     
-    this.superstate.ui.notify(`Make.md - Plugin loaded in ${(Date.now()-start)/1000} seconds`, 'console');
+    this.superstate.ui.notify(`VaultKit - Plugin loaded in ${(Date.now()-start)/1000} seconds`, 'console');
 
     if (this.superstate.settings.systemName == 'Vault') {
     this.superstate.settings.systemName = this.app.vault.getName();
@@ -769,7 +766,7 @@ this.markdownAdapter = new ObsidianMarkdownFiletypeAdapter(this);
   async saveSettings(refresh = true) {
 
     await this.saveData(this.superstate.settings);
-    this.obsidianAdapter.pathLastUpdated.set(normalizePath(this.app.vault.configDir + "/plugins/make-md/data.json"), Date.now());
+    this.obsidianAdapter.pathLastUpdated.set(normalizePath(this.app.vault.configDir + "/plugins/vault-kit/data.json"), Date.now());
     if (refresh)
     this.superstate.dispatchEvent("settingsChanged", null)
     

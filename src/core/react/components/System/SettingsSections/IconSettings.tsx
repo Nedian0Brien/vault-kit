@@ -1009,11 +1009,11 @@ export const IconSettings = ({ superstate }: SettingsProps) => {
                 <span
                   className="mk-callout-url"
                   onClick={() =>
-                    window.open("https://make.md/community", "_blank")
+                    window.open("https://github.com/Nedian0Brien/vault-kit", "_blank")
                   }
                   style={{ cursor: "pointer" }}
                 >
-                  https://make.md/community
+                  https://github.com/Nedian0Brien/vault-kit
                 </span>
                 <br />
                 <small style={{ opacity: 0.7 }}>

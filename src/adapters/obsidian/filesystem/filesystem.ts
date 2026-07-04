@@ -54,9 +54,9 @@ export class ObsidianFileSystem implements FileSystemAdapter {
         this.middleware = middleware
         this.plugin = plugin;
     if (Platform.isMobile) {
-      this.persister = new MobileCachePersister(".makemd/fileCache.mdc", this.plugin.mdbFileAdapter, ['file']);
+      this.persister = new MobileCachePersister(".vaultkit/fileCache.mdc", this.plugin.mdbFileAdapter, ['file']);
     } else {
-        this.persister = new LocalStorageCache(".makemd/fileCache.mdc", this.plugin.mdbFileAdapter, ['file']);
+        this.persister = new LocalStorageCache(".vaultkit/fileCache.mdc", this.plugin.mdbFileAdapter, ['file']);
     }
         
     }
@@ -95,7 +95,7 @@ export class ObsidianFileSystem implements FileSystemAdapter {
         this.updateFileLabel(path, "tags", serializeMultiDisplayString([...vaultItem.tags.filter(t => t.toLowerCase() != tag.toLowerCase())]))
     }
     public spacesDBPath  = normalizePath(
-    this.plugin.app.vault.configDir + "/plugins/make-md/Spaces.mdb"
+    this.plugin.app.vault.configDir + "/plugins/vault-kit/Spaces.mdb"
   );
   public checkIllegalCharacters (file: {name: string, path: string}) {
     if (illegalCharacters.some(f => file.name.includes(f)))
@@ -159,7 +159,7 @@ export class ObsidianFileSystem implements FileSystemAdapter {
         const start = Date.now();
         await Promise.all(this.vaultDBCache.map(f => this.middleware.createFileCache(f.path)));
 
-        this.plugin.superstate.ui.notify(`Make.md - File Cache Loaded in ${(Date.now()-start)/1000} seconds ${this.cache.size}`, 'console')
+        this.plugin.superstate.ui.notify(`VaultKit - File Cache Loaded in ${(Date.now()-start)/1000} seconds ${this.cache.size}`, 'console')
         this.middleware.eventDispatch.dispatchEvent("onFilesystemIndexed", null);
         this.plugin.registerEvent(this.plugin.app.vault.on("create", this.onCreate));
         this.plugin.registerEvent(this.plugin.app.vault.on("modify", this.onModify));
@@ -190,7 +190,7 @@ export class ObsidianFileSystem implements FileSystemAdapter {
                 return;
             }
             
-            if (path == normalizePath(this.plugin.app.vault.configDir + "/plugins/make-md/data.json")) {
+            if (path == normalizePath(this.plugin.app.vault.configDir + "/plugins/vault-kit/data.json")) {
                 this.plugin.superstate.settings = Object.assign({}, DEFAULT_SETTINGS, await this.plugin.loadData());
                 this.plugin.superstate.dispatchEvent("settingsChanged", null);
             } 

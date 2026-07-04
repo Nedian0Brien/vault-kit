@@ -30,7 +30,7 @@ export const InstallKit = (props: {
   const [kit, setKit] = useState(props.kit);
   const [space, setSpace] = useState<string>("/");
   const installKit = () => {
-    if (!kit.startsWith("https://www.make.md/static/kits/")) {
+    if (!kit.startsWith("https://")) {
       props.superstate.ui.notify(i18n.notice.invalidKitURL);
       return;
     }

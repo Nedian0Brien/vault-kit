@@ -87,7 +87,7 @@ export class WebSpaceAdapter implements SpaceAdapter {
       return [];
     }
     public async pathExists (path: string) {
-      if (!path.startsWith("https://www.make.md")) return false;
+      if (!path.startsWith("https://")) return false;
       return true;
     }
   public async createItemAtPath (parent: string, type: string, name: string, content?: any) : Promise<string> {

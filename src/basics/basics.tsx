@@ -27,9 +27,9 @@ export default class MakeBasicsPlugin {
   constructor(public plugin: MakeMDPlugin) {
     this.settings = plugin.superstate.settings.basicsSettings;
     this.app = plugin.app;
-    if (plugin.app.plugins.getPlugin("make-md")) {
+    if (plugin.app.plugins.getPlugin("vault-kit")) {
       const mkmdEnactor = new MakeMDEnactor(
-        plugin.app.plugins.getPlugin("make-md"),
+        plugin.app.plugins.getPlugin("vault-kit"),
         this
       );
       this.enactor = mkmdEnactor;

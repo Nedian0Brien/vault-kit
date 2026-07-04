@@ -15,9 +15,9 @@ private picaInstance;
         
 this.picaInstance = pica();
     }
-    public cacheDirectory = ".makemd/thumbnails";
+    public cacheDirectory = ".vaultkit/thumbnails";
     public supportedFileTypes = ["png", "jpg", "jpeg", "webp", "gif", "avif"];
-    public id = 'images.make.md';
+    public id = 'images.vaultkit';
     public middleware: FilesystemMiddleware;
     public cache: Map<string, ImageTypeCache>;
     public initiate (middleware: FilesystemMiddleware) {

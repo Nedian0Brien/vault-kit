@@ -161,7 +161,7 @@ export const showMainMenu = (
     name: i18n.menu.getHelp,
     icon: "ui//mk-logo",
     onClick: () => {
-      window.open("https://make.md/community");
+      window.open("https://github.com/Nedian0Brien/vault-kit");
     },
   });
 

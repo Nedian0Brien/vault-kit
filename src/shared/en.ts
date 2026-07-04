@@ -256,7 +256,7 @@ export const en = {
     "duplicate": "Make a copy",
     "edit": "Edit",
     "delete": "Delete",
-    "getHelp": "Make.md Community",
+    "getHelp": "VaultKit Community",
     "openVault": "Open Another Vault",
     "obSettings": "Obsidian Settings",
     "collapseAllSections": "Collapse All Spaces",
@@ -1032,8 +1032,8 @@ export const en = {
       "toggleDonutChart": "Toggle Donut Chart"
     },
     "onboarding": {
-      "welcome": "Welcome to Make.md",
-      "welcomeDesc": "Welcome to Make.md! Let's configure your essential settings to get you started.",
+      "welcome": "Welcome to VaultKit",
+      "welcomeDesc": "Welcome to VaultKit! Let's configure your essential settings to get you started.",
       "walkthrough": "We'll walk through the most important options to customize your experience.",
       "coreFeatures": "Core Features",
       "enableNavigator": "Enable Navigator (sidebar file browser)",
@@ -1131,7 +1131,7 @@ export const en = {
     },
     "overrideNativeMenu": {
       "name": "Use Obsidian Context Menu",
-      "desc": "Show the Obsidian context menu instead of Make.md"
+      "desc": "Show the Obsidian context menu instead of VaultKit"
     },
     "editStickerInSidebar": {
       "name": "Edit Stickers in Sidebar",
@@ -1202,8 +1202,8 @@ export const en = {
       "desc": "Name of the folder for spaces"
     },
     "basics": {
-      "name": "Make.md Basics",
-      "desc": "Enable features from Make.md Basics including styler and flow blocks"
+      "name": "VaultKit Basics",
+      "desc": "Enable features from VaultKit Basics including styler and flow blocks"
     },
     "spacesFolder": {
       "name": "Tag Space Folder",
