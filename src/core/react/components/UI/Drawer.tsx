@@ -10,6 +10,9 @@ export const MobileDrawer = (props: {
 }) => {
   const { newProps } = props;
   const [open, setOpen] = React.useState(true);
+  const [viewportStyle, setViewportStyle] = React.useState<React.CSSProperties>(
+    {}
+  );
   const drawerCount = useMemo(() => {
     const drawers = document.querySelectorAll(".mk-drawer-content");
     let drawerIndex = 0;
@@ -22,6 +25,35 @@ export const MobileDrawer = (props: {
       }
     });
     return drawerIndex;
+  }, []);
+  React.useEffect(() => {
+    const win = document.defaultView ?? window;
+    const viewport = win.visualViewport;
+    const updateViewportStyle = () => {
+      const height = Math.round(viewport?.height ?? win.innerHeight);
+      const offsetTop = Math.round(viewport?.offsetTop ?? 0);
+      const keyboardInset = Math.max(
+        0,
+        Math.round(win.innerHeight - height - offsetTop)
+      );
+
+      setViewportStyle({
+        "--mk-visual-viewport-height": `${height}px`,
+        "--mk-visual-viewport-offset-top": `${offsetTop}px`,
+        "--mk-keyboard-inset-bottom": `${keyboardInset}px`,
+      } as React.CSSProperties);
+    };
+
+    updateViewportStyle();
+    viewport?.addEventListener("resize", updateViewportStyle);
+    viewport?.addEventListener("scroll", updateViewportStyle);
+    win.addEventListener("resize", updateViewportStyle);
+
+    return () => {
+      viewport?.removeEventListener("resize", updateViewportStyle);
+      viewport?.removeEventListener("scroll", updateViewportStyle);
+      win.removeEventListener("resize", updateViewportStyle);
+    };
   }, []);
 
   return (
@@ -44,6 +76,7 @@ export const MobileDrawer = (props: {
           style={
             {
               "--drawer-index": drawerCount,
+              ...viewportStyle,
             } as React.CSSProperties
           }
         >
@@ -67,6 +100,7 @@ export const MobileDrawer = (props: {
           style={
             {
               "--drawer-index": drawerCount,
+              ...viewportStyle,
             } as React.CSSProperties
           }
         />
