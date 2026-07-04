@@ -15,9 +15,13 @@ export const showModal = (props: {
   win?: Window;
 }) => {
   const portalElement = props.win.document.createElement("div");
+  const isTouch = isTouchScreen(props.ui.manager);
 
-  if (isTouchScreen(props.ui.manager)) {
+  if (isTouch) {
     portalElement.classList.add("mk-modal-wrapper-mobile");
+    if (!props.isPalette) {
+      portalElement.classList.add("mk-modal-wrapper-centered");
+    }
   } else {
     portalElement.classList.add("mk-modal-wrapper");
   }
@@ -35,7 +39,6 @@ export const showModal = (props: {
 
   const root = props.ui.createRoot(portalElement);
   const hide = hideFunction(root);
-  const isTouch = isTouchScreen(props.ui.manager);
   const renderModalWrapper = (newProps: any) => (
     <ModalWrapper
       ui={props.ui.manager}

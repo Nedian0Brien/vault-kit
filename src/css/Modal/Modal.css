@@ -173,7 +173,7 @@
     background: none;
   }
 
-.mk-modal-wrapper {
+.mk-modal-wrapper, .mk-modal-wrapper-centered {
     padding: 0;
     -webkit-app-region: no-drag;
     background-color: var(--mk-ui-background-overlay);

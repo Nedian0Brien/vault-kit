@@ -46,6 +46,14 @@ const checks = [
     ),
   },
   {
+    name: "mobile centered modal portal has fixed wrapper styles",
+    pass:
+      modal.includes('portalElement.classList.add("mk-modal-wrapper-centered")') &&
+      /\.mk-modal-wrapper,\s*\.mk-modal-wrapper-centered[\s\S]*position:\s*fixed/.test(
+        modalCss
+      ),
+  },
+  {
     name: "centered mobile modal follows visual viewport",
     pass:
       modalWrapper.includes("--mk-visual-viewport-height") &&
