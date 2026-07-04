@@ -21,8 +21,8 @@ const checks = [
     pass: drawer.includes('addEventListener("resize"'),
   },
   {
-    name: "MobileDrawer uses Vaul fixed keyboard behavior",
-    pass: /<Drawer\.Root[\s\S]*\bfixed\b/.test(drawer),
+    name: "MobileDrawer does not shrink compact drawers with Vaul fixed mode",
+    pass: !/<Drawer\.Root[\s\S]*\bfixed\b[\s\S]*>/.test(drawer),
   },
   {
     name: "InputModal delays mobile autofocus",
@@ -33,10 +33,11 @@ const checks = [
     pass: inputModal.includes("preventScroll: true"),
   },
   {
-    name: "mobile drawer modal preserves closed-keyboard spacing",
-    pass: /\.mk-drawer-content\.mk-drawer-modal[\s\S]*margin-bottom:\s*50px/.test(
-      menuCss
-    ),
+    name: "mobile drawer modal removes extra bottom gap when keyboard opens",
+    pass:
+      /\.mk-drawer-content\.mk-drawer-modal[\s\S]*50px - var\(--mk-keyboard-inset-bottom/.test(
+        menuCss
+      ),
   },
   {
     name: "mobile drawer modal caps height to visual viewport",
