@@ -326,6 +326,23 @@ max-height: var(--mk-menu-max-height)
   overflow-y: auto;
 }
 
+.is-phone .mk-drawer-content.mk-drawer-menu {
+  height: auto !important;
+  top: auto !important;
+  max-height: min(96%, calc(var(--mk-visual-viewport-height, 100vh) - 24px)) !important;
+}
+
+.is-phone .mk-drawer-content.mk-drawer-menu .mk-menu-container {
+  height: auto;
+  min-height: 0;
+  flex-wrap: nowrap;
+}
+
+.is-phone .mk-drawer-content.mk-drawer-menu .mk-menu-suggestions {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
 
 
 .mk-menu-input {

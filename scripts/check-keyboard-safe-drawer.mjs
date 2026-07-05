@@ -200,6 +200,20 @@ const checks = [
       ),
   },
   {
+    name: "phone drawer menus cannot keep an inline full-screen height",
+    pass:
+      /\.is-phone \.mk-drawer-content\.mk-drawer-menu\s*\{[\s\S]*height:\s*auto !important[\s\S]*top:\s*auto !important[\s\S]*max-height:[\s\S]*!important/.test(
+        menuCss
+      ),
+  },
+  {
+    name: "phone drawer menu suggestions override phone flex stretch",
+    pass:
+      /\.is-phone \.mk-drawer-content\.mk-drawer-menu \.mk-menu-suggestions\s*\{[\s\S]*flex:\s*0 1 auto[\s\S]*min-height:\s*0/.test(
+        menuCss
+      ),
+  },
+  {
     name: "mobile select menu input does not autofocus and trigger Vaul keyboard resize",
     pass:
       selectMenuInput.includes("isPhone") &&
