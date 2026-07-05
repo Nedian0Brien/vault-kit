@@ -10,6 +10,8 @@ import { emojiFromString } from "shared/utils/stickers";
 import { default as i18n } from "shared/i18n";
 import { IUIManager as UIManager } from "../types/uiManager";
 
+const STICKER_PAGE_SIZE = 100;
+
 interface StickerModalProps {
   ui: UIManager;
   selectedSticker: (path: string) => void;
@@ -20,7 +22,6 @@ interface StickerModalProps {
 const StickerModal: React.FC<StickerModalProps> = (props) => {
   const [query, setQuery] = useState("");
   const [allStickers, setAllStickers] = useState<Sticker[]>([]);
-  const [stickers, setStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<number>(null);
 
   const htmlFromSticker = (sticker: Sticker) => {
@@ -42,10 +43,31 @@ const StickerModal: React.FC<StickerModalProps> = (props) => {
   );
 
   const [page, setPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    props.initialCategory ?? null
+  );
+
+  const filteredStickers = useMemo(
+    () =>
+      allStickers.filter(
+        (f) =>
+          f.name.includes(query.toLowerCase()) &&
+          (selectedCategory == null || f.type == selectedCategory)
+      ),
+    [query, allStickers, selectedCategory]
+  );
+
+  const stickers = useMemo(
+    () => filteredStickers.slice(0, page * STICKER_PAGE_SIZE),
+    [filteredStickers, page]
+  );
+
+  const hasMoreStickers = stickers.length < filteredStickers.length;
 
   const loadNextPage = useCallback(() => {
+    if (!hasMoreStickers) return;
     setPage((p) => p + 1);
-  }, [page]);
+  }, [hasMoreStickers]);
   const loaderRef = useRef(null);
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -65,20 +87,11 @@ const StickerModal: React.FC<StickerModalProps> = (props) => {
       }
     };
   }, [loadNextPage]);
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    props.initialCategory ?? null
-  );
+
   useEffect(() => {
-    setStickers(
-      allStickers
-        .filter(
-          (f) =>
-            f.name.includes(query.toLowerCase()) &&
-            (selectedCategory == null || f.type == selectedCategory)
-        )
-        .slice(0, page * 250)
-    );
-  }, [query, allStickers, page, selectedCategory]);
+    setPage(1);
+    setSelectedSticker(null);
+  }, [query, selectedCategory]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
@@ -170,7 +183,7 @@ const StickerModal: React.FC<StickerModalProps> = (props) => {
             />
           </div>
         ))}
-        <div ref={loaderRef}></div>
+        {hasMoreStickers && <div ref={loaderRef}></div>}
       </div>
     </>
   );

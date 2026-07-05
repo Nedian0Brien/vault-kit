@@ -228,6 +228,15 @@ const checks = [
       stickerModal.includes("initialCategory?: string") &&
       stickerModal.includes("props.initialCategory ?? null"),
   },
+  {
+    name: "sticker palette incrementally loads large sticker sets",
+    pass:
+      stickerModal.includes("const STICKER_PAGE_SIZE = 100") &&
+      stickerModal.includes("filteredStickers.slice(0, page * STICKER_PAGE_SIZE)") &&
+      stickerModal.includes("hasMoreStickers") &&
+      stickerModal.includes("setPage(1)") &&
+      stickerModal.includes("setSelectedSticker(null)"),
+  },
 ];
 
 const failures = checks.filter((check) => !check.pass);
