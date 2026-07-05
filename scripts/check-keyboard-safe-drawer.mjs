@@ -175,6 +175,18 @@ const checks = [
       nativeObsidianMenu.includes("sticker: \"sticker\""),
   },
   {
+    name: "native mobile submenu opens after parent action sheet closes",
+    pass:
+      nativeObsidianMenu.includes("isOpeningSubmenu") &&
+      nativeObsidianMenu.includes("item:submenu-open:deferred") &&
+      /isOpeningSubmenu = true;[\s\S]*hideParent\(\);[\s\S]*win\.setTimeout/.test(
+        nativeObsidianMenu
+      ) &&
+      nativeObsidianMenu.includes(
+        "if (submenu || isComplete || isOpeningSubmenu) return;"
+      ),
+  },
+  {
     name: "mobile color picker submenus prefer native Obsidian menu",
     pass:
       colorPickerMenu.includes("showNativeColorPickerMenu") &&
