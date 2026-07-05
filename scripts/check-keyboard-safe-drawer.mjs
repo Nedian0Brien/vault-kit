@@ -41,14 +41,26 @@ const checks = [
       drawer.includes("shouldScaleBackground={props.scaleBackground ?? true}"),
   },
   {
+    name: "MobileDrawer can disable Vaul scroll prevention",
+    pass:
+      drawer.includes("disablePreventScroll?: boolean") &&
+      drawer.includes(
+        "disablePreventScroll={props.disablePreventScroll ?? false}"
+      ),
+  },
+  {
     name: "mobile modals do not scale the Obsidian app container",
     pass: /<MobileDrawer[\s\S]*scaleBackground={false}/.test(modal),
   },
   {
-    name: "mobile menu drawers do not scale the Obsidian app container",
-    pass: /<MobileDrawer[\s\S]*className={classNames\("mk-drawer-menu"[\s\S]*scaleBackground={false}/.test(
-      menu
-    ),
+    name: "mobile menu drawers do not move or scale the Obsidian app container",
+    pass:
+      /<MobileDrawer[\s\S]*className={classNames\("mk-drawer-menu"[\s\S]*scaleBackground={false}/.test(
+        menu
+      ) &&
+      /<MobileDrawer[\s\S]*className={classNames\("mk-drawer-menu"[\s\S]*disablePreventScroll={true}/.test(
+        menu
+      ),
   },
   {
     name: "mobile input modals render as centered modal wrappers",
