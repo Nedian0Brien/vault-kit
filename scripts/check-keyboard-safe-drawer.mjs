@@ -30,12 +30,24 @@ const colorPickerMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/properties/colorPickerMenu.tsx",
   "utf8"
 );
+const selectSpaceMenu = fs.readFileSync(
+  "src/core/react/components/UI/Menus/properties/selectSpaceMenu.tsx",
+  "utf8"
+);
 const stickerPickerMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/properties/stickerPickerMenu.tsx",
   "utf8"
 );
 const stickerModal = fs.readFileSync(
   "src/shared/components/StickerModal.tsx",
+  "utf8"
+);
+const navigatorFocusEditor = fs.readFileSync(
+  "src/core/react/components/Navigator/SpaceTree/NavigatorFocusEditor.tsx",
+  "utf8"
+);
+const spaceTreeVirtualized = fs.readFileSync(
+  "src/core/react/components/Navigator/SpaceTree/SpaceTreeVirtualized.tsx",
   "utf8"
 );
 
@@ -204,6 +216,21 @@ const checks = [
       !colorPickerMenu.includes('fill="${fill}" stroke='),
   },
   {
+    name: "Navigator Open uses native spaces menu instead of Blink palette",
+    pass:
+      selectSpaceMenu.includes("showNativeSpacesMenu") &&
+      selectSpaceMenu.includes("searchable: false") &&
+      selectSpaceMenu.includes("showAll: true") &&
+      selectSpaceMenu.includes("onClick: () => saveLink(f.path)") &&
+      selectSpaceMenu.includes("floatingSearch") &&
+      selectSpaceMenu.includes("reopenWithQuery") &&
+      !selectSpaceMenu.includes("BlinkMode.Open") &&
+      navigatorFocusEditor.includes("showNativeSpacesMenu(") &&
+      spaceTreeVirtualized.includes("showNativeSpacesMenu(") &&
+      !navigatorFocusEditor.includes("BlinkMode.Open") &&
+      !spaceTreeVirtualized.includes("BlinkMode.Open"),
+  },
+  {
     name: "mobile sticker picker uses the palette instead of native Obsidian menu",
     pass:
       stickerPickerMenu.includes("showStickerPickerMenu") &&
@@ -219,13 +246,16 @@ const checks = [
       !stickerPickerMenu.includes("noIcon"),
   },
   {
-    name: "native mobile menu does not embed input elements inside Obsidian Menu",
+    name: "native mobile menu keeps search input outside Obsidian Menu items",
     pass:
       !menuTypes.includes("nativeSearch?:") &&
       !nativeObsidianMenu.includes("option.nativeSearch") &&
-      !nativeObsidianMenu.includes("createElement(\"input\")") &&
+      nativeObsidianMenu.includes("attachFloatingSearch") &&
+      nativeObsidianMenu.includes("document.body.appendChild(search)") &&
+      !nativeObsidianMenu.includes("setTitle(search)") &&
       !nativeObsidianMenu.includes("vaultkit-native-search-input") &&
-      !menuCss.includes(".vaultkit-native-search-input"),
+      !menuCss.includes(".vaultkit-native-search-input") &&
+      menuCss.includes(".vaultkit-native-search-pill"),
   },
   {
     name: "sticker palette incrementally loads large sticker sets",

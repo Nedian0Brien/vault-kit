@@ -4,13 +4,13 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Pos } from "shared/types/Pos";
 
 import { NavigatorContext } from "core/react/context/SidebarContext";
+import { showNativeSpacesMenu } from "core/react/components/UI/Menus/properties/selectSpaceMenu";
 import { TreeNode } from "core/superstate/utils/spaces";
 import { DragProjection } from "core/utils/dnd/dragPath";
 import { Superstate } from "makemd-core";
 import i18n from "shared/i18n";
 import React, { CSSProperties, useContext } from "react";
 import { windowFromDocument } from "shared/utils/dom";
-import { BlinkMode } from "../../../../../shared/types/blink";
 import { TreeItem } from "./SpaceTreeItem";
 
 export const VirtualizedList = React.memo(function VirtualizedList(props: {
@@ -153,13 +153,18 @@ export const VirtualizedList = React.memo(function VirtualizedList(props: {
                   const rect = (
                     e.target as HTMLElement
                   ).getBoundingClientRect();
-                  props.superstate.ui.quickOpen(
-                    BlinkMode.Open,
+                  const win = windowFromDocument(e.view.document);
+                  const openSpace = (link: string) => {
+                    saveActiveSpace(link);
+                  };
+                  showNativeSpacesMenu(
                     rect,
-                    windowFromDocument(e.view.document),
-                    (link) => {
-                      saveActiveSpace(link);
-                    }
+                    win,
+                    props.superstate,
+                    openSpace,
+                    true,
+                    false,
+                    false
                   );
                 }}
               >
