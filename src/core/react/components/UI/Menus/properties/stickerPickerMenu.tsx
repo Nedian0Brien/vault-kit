@@ -8,6 +8,7 @@ import { Rect } from "shared/types/Pos";
 import { Sticker } from "shared/types/ui";
 import { defaultMenu, menuSeparator } from "../menu/SelectionMenu";
 
+const NATIVE_STICKER_BATCH_SIZE = 100;
 const stickerValue = (sticker: Sticker) => `${sticker.type}//${sticker.value}`;
 
 const nativeStickerIcon = (sticker: Sticker) =>
@@ -46,26 +47,24 @@ const showNativeStickerCategoryMenu = (
   rect: Rect,
   win: Window,
   category: string,
-  selectedSticker: (sticker: string) => void
+  selectedSticker: (sticker: string) => void,
+  visibleCount = NATIVE_STICKER_BATCH_SIZE
 ): MenuObject => {
-  if (category == "emoji") {
-    logStickerPicker("category:emoji-open-palette", { category });
-    return openStickerPalette(superstate, win, selectedSticker, category);
-  }
-
   const allStickers = superstate.ui.allStickers();
   const categoryStickers = allStickers.filter(
     (sticker) => sticker.type == category
   );
+  const visibleStickers = categoryStickers.slice(0, visibleCount);
   logStickerPicker("category:build-options:start", {
     category,
     allCount: allStickers.length,
     categoryCount: categoryStickers.length,
+    visibleCount: visibleStickers.length,
     rect,
-    sample: categoryStickers.slice(0, 5).map(stickerSample),
+    sample: visibleStickers.slice(0, 5).map(stickerSample),
   });
 
-  const options = categoryStickers.map(
+  const options = visibleStickers.map(
     (sticker): SelectOption => ({
       name: sticker.name,
       icon: nativeStickerIcon(sticker),
@@ -73,9 +72,29 @@ const showNativeStickerCategoryMenu = (
     })
   );
 
+  if (visibleStickers.length < categoryStickers.length) {
+    options.push(menuSeparator);
+    options.push({
+      name: `${i18n.labels.loadMore} (${visibleStickers.length}/${categoryStickers.length})`,
+      icon: "ui//plus",
+      autoLoadMore: true,
+      onClick: () =>
+        showNativeStickerCategoryMenu(
+          superstate,
+          rect,
+          win,
+          category,
+          selectedSticker,
+          visibleCount + NATIVE_STICKER_BATCH_SIZE
+        ),
+    });
+  }
+
   logStickerPicker("category:open-menu:before", {
     category,
     optionCount: options.length,
+    visibleCount: visibleStickers.length,
+    totalCount: categoryStickers.length,
     firstOption: options[0]?.name ?? null,
     lastOption: options[options.length - 1]?.name ?? null,
   });

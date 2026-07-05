@@ -25,6 +25,7 @@ const nativeObsidianMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/nativeObsidianMenu.ts",
   "utf8"
 );
+const menuTypes = fs.readFileSync("src/shared/types/menu.ts", "utf8");
 const colorPickerMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/properties/colorPickerMenu.tsx",
   "utf8"
@@ -218,15 +219,21 @@ const checks = [
       !stickerPickerMenu.includes("emojiFromString"),
   },
   {
-    name: "mobile emoji sticker category bypasses native drawer",
+    name: "mobile sticker native drawer pages large sticker categories",
     pass:
-      stickerPickerMenu.includes('if (category == "emoji")') &&
-      stickerPickerMenu.includes('"category:emoji-open-palette"') &&
+      stickerPickerMenu.includes("const NATIVE_STICKER_BATCH_SIZE = 100") &&
+      stickerPickerMenu.includes("visibleCount = NATIVE_STICKER_BATCH_SIZE") &&
+      stickerPickerMenu.includes("categoryStickers.slice(0, visibleCount)") &&
+      stickerPickerMenu.includes("i18n.labels.loadMore") &&
       stickerPickerMenu.includes(
-        "openStickerPalette(superstate, win, selectedSticker, category)"
+        "visibleCount + NATIVE_STICKER_BATCH_SIZE"
       ) &&
-      stickerModal.includes("initialCategory?: string") &&
-      stickerModal.includes("props.initialCategory ?? null"),
+      stickerPickerMenu.includes("autoLoadMore: true") &&
+      nativeObsidianMenu.includes("attachAutoLoadMoreScroll") &&
+      nativeObsidianMenu.includes("findScrollableMenuElement") &&
+      nativeObsidianMenu.includes("distanceFromBottom > 96") &&
+      menuTypes.includes("autoLoadMore?: boolean") &&
+      !stickerPickerMenu.includes('if (category == "emoji")'),
   },
   {
     name: "sticker palette incrementally loads large sticker sets",

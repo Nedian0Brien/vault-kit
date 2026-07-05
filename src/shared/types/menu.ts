@@ -57,6 +57,7 @@ export enum SelectOptionType {
     section?: string;
     description?: string;
     icon?: string;
+    autoLoadMore?: boolean;
     sortable?: boolean;
     removeable?: boolean;
     disabled?: boolean;

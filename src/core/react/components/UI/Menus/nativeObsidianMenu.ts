@@ -32,7 +32,20 @@ const optionSample = (option: SelectOption) => ({
   type: option.type ?? SelectOptionType.Option,
   disabled: Boolean(option.disabled),
   hasSubmenu: Boolean(option.onSubmenu),
+  autoLoadMore: Boolean(option.autoLoadMore),
 });
+
+const findScrollableMenuElement = (menuEl: HTMLElement, win: Window) => {
+  const candidates = [
+    menuEl,
+    ...Array.from(menuEl.querySelectorAll<HTMLElement>("*")),
+  ];
+  return candidates.find((el) => {
+    if (el.scrollHeight <= el.clientHeight) return false;
+    const overflowY = win.getComputedStyle(el).overflowY;
+    return overflowY == "auto" || overflowY == "scroll" || el == menuEl;
+  });
+};
 
 const uiIconMap: Record<string, string> = {
   "apply-items": "list-checks",
@@ -142,6 +155,8 @@ export const showNativeObsidianMenu = (
   let isComplete = false;
   let isParentHidden = false;
   let submenu: { hide: (suppress?: boolean) => void } | null = null;
+  let removeAutoLoadMoreScroll: (() => void) | null = null;
+  let autoLoadMoreTriggered = false;
   logNativeMenu("show:start", {
     optionCount: optionProps.options.length,
     anchor: defaultAnchor,
@@ -158,6 +173,8 @@ export const showNativeObsidianMenu = (
   const hide = (suppress?: boolean) => {
     if (isComplete) return;
     isComplete = true;
+    removeAutoLoadMoreScroll?.();
+    removeAutoLoadMoreScroll = null;
     if (submenu) submenu.hide(true);
     hideParent();
     if (!suppress) onHide?.();
@@ -173,6 +190,45 @@ export const showNativeObsidianMenu = (
       option.section
     );
     return true;
+  };
+
+  const attachAutoLoadMoreScroll = () => {
+    const autoLoadMoreOption = optionProps.options.find(
+      (option) => option.autoLoadMore && option.onClick
+    );
+    if (!autoLoadMoreOption || !menu.dom) return;
+
+    const scrollEl = findScrollableMenuElement(menu.dom, win);
+    if (!scrollEl) {
+      logNativeMenu("show:auto-load-more:no-scroll-target", {
+        optionCount: optionProps.options.length,
+      });
+      return;
+    }
+
+    const onScroll = () => {
+      if (isComplete || autoLoadMoreTriggered) return;
+      if (scrollEl.scrollHeight <= scrollEl.clientHeight) return;
+
+      const distanceFromBottom =
+        scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight;
+      if (distanceFromBottom > 96) return;
+
+      autoLoadMoreTriggered = true;
+      logNativeMenu("show:auto-load-more:trigger", {
+        option: optionSample(autoLoadMoreOption),
+        optionCount: optionProps.options.length,
+        distanceFromBottom,
+      });
+      autoLoadMoreOption.onClick?.(
+        toReactMouseEvent(new win.MouseEvent("click", { view: win }), win)
+      );
+      hide(true);
+    };
+
+    scrollEl.addEventListener("scroll", onScroll, { passive: true });
+    removeAutoLoadMoreScroll = () =>
+      scrollEl.removeEventListener("scroll", onScroll);
   };
 
   optionProps.options.forEach((option, index) => {
@@ -245,6 +301,7 @@ export const showNativeObsidianMenu = (
   logNativeMenu("show:show-at-position:after", {
     optionCount: optionProps.options.length,
   });
+  win.setTimeout(attachAutoLoadMoreScroll, 0);
 
   return {
     hide,
