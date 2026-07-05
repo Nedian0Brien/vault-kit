@@ -22,6 +22,18 @@ const toMenuPosition = (rect: Rect, anchor: Anchors) => ({
   width: rect.width,
 });
 
+const logNativeMenu = (message: string, data?: Record<string, unknown>) => {
+  console.info("[VaultKit][native-menu]", message, data ?? {});
+};
+
+const optionSample = (option: SelectOption) => ({
+  name: option.name,
+  icon: option.icon ?? null,
+  type: option.type ?? SelectOptionType.Option,
+  disabled: Boolean(option.disabled),
+  hasSubmenu: Boolean(option.onSubmenu),
+});
+
 const uiIconMap: Record<string, string> = {
   "apply-items": "list-checks",
   "arrow-up-down": "arrow-up-down",
@@ -130,6 +142,12 @@ export const showNativeObsidianMenu = (
   let isComplete = false;
   let isParentHidden = false;
   let submenu: { hide: (suppress?: boolean) => void } | null = null;
+  logNativeMenu("show:start", {
+    optionCount: optionProps.options.length,
+    anchor: defaultAnchor,
+    position: toMenuPosition(rect, defaultAnchor),
+    sample: optionProps.options.slice(0, 5).map(optionSample),
+  });
 
   const hideParent = () => {
     if (isParentHidden) return;
@@ -157,7 +175,17 @@ export const showNativeObsidianMenu = (
     return true;
   };
 
-  optionProps.options.forEach((option) => {
+  optionProps.options.forEach((option, index) => {
+    if (
+      optionProps.options.length > 100 &&
+      (index == 0 || index % 250 == 0 || index == optionProps.options.length - 1)
+    ) {
+      logNativeMenu("show:add-item:progress", {
+        index,
+        optionCount: optionProps.options.length,
+        option: optionSample(option),
+      });
+    }
     if (option.type == SelectOptionType.Separator) {
       menu.addSeparator();
       return;
@@ -181,6 +209,10 @@ export const showNativeObsidianMenu = (
       item.onClick((event) => {
         if (option.disabled) return;
         if (option.onSubmenu) {
+          logNativeMenu("item:submenu-click", {
+            option: optionSample(option),
+            parentOptionCount: optionProps.options.length,
+          });
           const nextMenu = option.onSubmenu(rect, () => hide(false));
           submenu?.hide(true);
           submenu = nextMenu;
@@ -204,7 +236,15 @@ export const showNativeObsidianMenu = (
     if (submenu || isComplete) return;
     hide(false);
   });
-  menu.showAtPosition(toMenuPosition(rect, defaultAnchor), win.document);
+  const position = toMenuPosition(rect, defaultAnchor);
+  logNativeMenu("show:show-at-position:before", {
+    optionCount: optionProps.options.length,
+    position,
+  });
+  menu.showAtPosition(position, win.document);
+  logNativeMenu("show:show-at-position:after", {
+    optionCount: optionProps.options.length,
+  });
 
   return {
     hide,
