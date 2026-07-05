@@ -17,6 +17,14 @@ const selectMenuComponent = fs.readFileSync(
   "utf8"
 );
 const menu = fs.readFileSync("src/core/react/components/UI/Menus/menu.tsx", "utf8");
+const selectMenu = fs.readFileSync(
+  "src/core/react/components/UI/Menus/selectMenu.tsx",
+  "utf8"
+);
+const nativeObsidianMenu = fs.readFileSync(
+  "src/core/react/components/UI/Menus/nativeObsidianMenu.ts",
+  "utf8"
+);
 
 const checks = [
   {
@@ -126,6 +134,22 @@ const checks = [
       /useState<SelectOption\[\]>\(\(\) =>\s*getOptions\(props, query, section\)/.test(
         selectMenuComponent
       ) && !/useState<SelectOption\[\]>\(\[\]\)/.test(selectMenuComponent),
+  },
+  {
+    name: "mobile standard select menus prefer Obsidian native menu",
+    pass:
+      selectMenu.includes("canShowNativeObsidianMenu") &&
+      selectMenu.includes("showNativeObsidianMenu") &&
+      nativeObsidianMenu.includes("new Menu()") &&
+      nativeObsidianMenu.includes("showAtPosition"),
+  },
+  {
+    name: "native mobile menu falls back for custom Make menu features",
+    pass:
+      nativeObsidianMenu.includes("SelectOptionType.Input") &&
+      nativeObsidianMenu.includes("SelectOptionType.Custom") &&
+      nativeObsidianMenu.includes("option.onMoreOptions") &&
+      nativeObsidianMenu.includes("option.onRemove"),
   },
 ];
 

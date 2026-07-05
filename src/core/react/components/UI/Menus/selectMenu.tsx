@@ -2,6 +2,10 @@ import { SelectMenu, SelectMenuProps } from "makemd-core";
 import React from "react";
 import { Anchors, Rect } from "shared/types/Pos";
 import { showMenu } from "./menu";
+import {
+  canShowNativeObsidianMenu,
+  showNativeObsidianMenu,
+} from "./nativeObsidianMenu";
 
 export type Point = { x: number; y: number };
 
@@ -13,6 +17,9 @@ export const showSelectMenu = (
   onHide?: () => void,
   force?: boolean
 ) => {
+  if (canShowNativeObsidianMenu(optionProps, force)) {
+    return showNativeObsidianMenu(rect, optionProps, win, defaultAnchor, onHide);
+  }
   return showMenu({
     ui: optionProps.ui,
     rect: rect,
