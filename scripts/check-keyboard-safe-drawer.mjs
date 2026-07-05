@@ -178,6 +178,20 @@ const checks = [
       ),
   },
   {
+    name: "mobile drawer menu containers size to their content on first frame",
+    pass:
+      /\.mk-drawer-content \.mk-menu-container\s*\{[\s\S]*height:\s*auto[\s\S]*min-height:\s*0[\s\S]*flex-wrap:\s*nowrap/.test(
+        menuCss
+      ),
+  },
+  {
+    name: "mobile drawer suggestions do not stretch the drawer before content settles",
+    pass:
+      /\.mk-drawer-content \.mk-menu-suggestions\s*\{[\s\S]*flex:\s*0 1 auto[\s\S]*min-height:\s*0/.test(
+        menuCss
+      ),
+  },
+  {
     name: "mobile select menus render options before drawer enter transition",
     pass:
       /useState<SelectOption\[\]>\(\(\) =>\s*getOptions\(props, query, section\)/.test(
