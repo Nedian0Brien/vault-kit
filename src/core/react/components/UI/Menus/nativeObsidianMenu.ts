@@ -9,11 +9,6 @@ import {
 } from "shared/types/menu";
 import { Anchors, Rect } from "shared/types/Pos";
 
-const FLOATING_SEARCH_MIN_SIDE_GAP = 16;
-const FLOATING_SEARCH_TOP_GAP = 8;
-const FLOATING_SEARCH_HEIGHT = 44;
-const FLOATING_SEARCH_MENU_GAP = 10;
-
 const unsupportedOptionTypes = new Set<SelectOptionType>([
   SelectOptionType.Disclosure,
   SelectOptionType.Input,
@@ -50,118 +45,6 @@ const findScrollableMenuElement = (menuEl: HTMLElement, win: Window) => {
     const overflowY = win.getComputedStyle(el).overflowY;
     return overflowY == "auto" || overflowY == "scroll" || el == menuEl;
   });
-};
-
-const getVisualViewportBounds = (win: Window) => {
-  const visualViewport = win.visualViewport;
-  return {
-    top: visualViewport?.offsetTop ?? 0,
-    height: visualViewport?.height ?? win.innerHeight,
-    width: visualViewport?.width ?? win.innerWidth,
-  };
-};
-
-const getFloatingSearchAnchor = (menuEl: HTMLElement) => {
-  const candidates = [
-    menuEl.closest<HTMLElement>("[vaul-drawer]"),
-    menuEl.closest<HTMLElement>("[data-vaul-drawer]"),
-    menuEl.closest<HTMLElement>(".modal"),
-    menuEl,
-  ];
-  return (
-    candidates.find((el) => {
-      if (!el) return false;
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.width > FLOATING_SEARCH_MIN_SIDE_GAP * 2 &&
-        rect.height > FLOATING_SEARCH_HEIGHT
-      );
-    }) ?? menuEl
-  );
-};
-
-const attachFloatingSearch = (
-  menu: Menu,
-  optionProps: SelectMenuProps,
-  win: Window
-) => {
-  if (!optionProps.floatingSearch || !menu.dom) return null;
-
-  const search = win.document.createElement("input");
-  search.type = "search";
-  search.value = optionProps.floatingSearch.value;
-  search.placeholder = optionProps.floatingSearch.placeholder;
-  search.autocomplete = "off";
-  search.spellcheck = false;
-  search.className = "vaultkit-native-search-pill";
-  search.setAttribute("aria-label", optionProps.floatingSearch.placeholder);
-
-  const stopMenuEvent = (event: Event) => event.stopPropagation();
-  const syncPosition = () => {
-    if (!menu.dom || !search.isConnected) return;
-    const anchorEl = getFloatingSearchAnchor(menu.dom);
-    const anchorRect = anchorEl.getBoundingClientRect();
-    const viewport = getVisualViewportBounds(win);
-    const maxWidth = Math.max(
-      0,
-      viewport.width - FLOATING_SEARCH_MIN_SIDE_GAP * 2
-    );
-    const width = Math.min(
-      Math.max(0, anchorRect.width - FLOATING_SEARCH_MIN_SIDE_GAP * 2),
-      maxWidth
-    );
-    const left = Math.min(
-      Math.max(
-        anchorRect.left + FLOATING_SEARCH_MIN_SIDE_GAP,
-        FLOATING_SEARCH_MIN_SIDE_GAP
-      ),
-      viewport.width - width - FLOATING_SEARCH_MIN_SIDE_GAP
-    );
-    const top =
-      anchorRect.top - FLOATING_SEARCH_HEIGHT - FLOATING_SEARCH_MENU_GAP;
-
-    search.style.left = `${left}px`;
-    search.style.top = `${Math.max(viewport.top + FLOATING_SEARCH_TOP_GAP, top)}px`;
-    search.style.width = `${width}px`;
-  };
-  const onInput = () => optionProps.floatingSearch?.onChange(search.value);
-  const menuZIndex = Number.parseInt(
-    win.getComputedStyle(getFloatingSearchAnchor(menu.dom)).zIndex,
-    10
-  );
-  if (Number.isFinite(menuZIndex)) {
-    search.style.zIndex = `${menuZIndex + 2}`;
-  }
-
-  search.addEventListener("pointerdown", stopMenuEvent);
-  search.addEventListener("click", stopMenuEvent);
-  search.addEventListener("keydown", stopMenuEvent);
-  search.addEventListener("input", onInput);
-  win.addEventListener("resize", syncPosition);
-  win.visualViewport?.addEventListener("resize", syncPosition);
-  win.visualViewport?.addEventListener("scroll", syncPosition);
-  win.document.body.appendChild(search);
-  syncPosition();
-  logNativeMenu("show:floating-search:attached", {
-    zIndex: search.style.zIndex || null,
-    anchor: getFloatingSearchAnchor(menu.dom).tagName,
-    anchorClass: getFloatingSearchAnchor(menu.dom).className,
-    valueLength: optionProps.floatingSearch.value.length,
-  });
-  if (optionProps.floatingSearch.autoFocus) {
-    win.setTimeout(() => search.focus({ preventScroll: true }), 0);
-  }
-
-  return () => {
-    search.removeEventListener("pointerdown", stopMenuEvent);
-    search.removeEventListener("click", stopMenuEvent);
-    search.removeEventListener("keydown", stopMenuEvent);
-    search.removeEventListener("input", onInput);
-    win.removeEventListener("resize", syncPosition);
-    win.visualViewport?.removeEventListener("resize", syncPosition);
-    win.visualViewport?.removeEventListener("scroll", syncPosition);
-    search.remove();
-  };
 };
 
 const uiIconMap: Record<string, string> = {
@@ -273,7 +156,6 @@ export const showNativeObsidianMenu = (
   let isParentHidden = false;
   let submenu: { hide: (suppress?: boolean) => void } | null = null;
   let removeAutoLoadMoreScroll: (() => void) | null = null;
-  let removeFloatingSearch: (() => void) | null = null;
   let autoLoadMoreTriggered = false;
   logNativeMenu("show:start", {
     optionCount: optionProps.options.length,
@@ -293,8 +175,6 @@ export const showNativeObsidianMenu = (
     isComplete = true;
     removeAutoLoadMoreScroll?.();
     removeAutoLoadMoreScroll = null;
-    removeFloatingSearch?.();
-    removeFloatingSearch = null;
     if (submenu) submenu.hide(true);
     hideParent();
     if (!suppress) onHide?.();
@@ -421,7 +301,6 @@ export const showNativeObsidianMenu = (
   logNativeMenu("show:show-at-position:after", {
     optionCount: optionProps.options.length,
   });
-  removeFloatingSearch = attachFloatingSearch(menu, optionProps, win);
   win.setTimeout(attachAutoLoadMoreScroll, 0);
 
   return {

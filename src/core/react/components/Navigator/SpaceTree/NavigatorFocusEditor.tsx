@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { NavigatorContext } from "core/react/context/SidebarContext";
-import { showNativeSpacesMenu } from "core/react/components/UI/Menus/properties/selectSpaceMenu";
 import { createSpace } from "core/superstate/utils/spaces";
 import { Superstate } from "makemd-core";
 import i18n from "shared/i18n";
@@ -8,6 +7,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Focus } from "shared/types/focus";
 import { windowFromDocument } from "shared/utils/dom";
 import StickerModal from "../../../../../shared/components/StickerModal";
+import { BlinkMode } from "../../../../../shared/types/blink";
 export const FocusEditor = (props: {
   superstate: Superstate;
   focus: Focus;
@@ -76,26 +76,21 @@ export const FocusEditor = (props: {
         <button
           onClick={(e) => {
             const rect = (e.target as HTMLElement).getBoundingClientRect();
-            const win = windowFromDocument(e.view.document);
-            const openSpace = (link: string) => {
-              const isNew = !props.superstate.pathsIndex.has(link);
-              if (isNew) {
-                createSpace(props.superstate, link, {}).then((f) => {
-                  saveActiveSpace(link);
-                  props.superstate.ui.openPath(link, false);
-                });
-                return;
-              }
-              saveActiveSpace(link);
-            };
-            showNativeSpacesMenu(
+            props.superstate.ui.quickOpen(
+              BlinkMode.Open,
               rect,
-              win,
-              props.superstate,
-              openSpace,
-              true,
-              false,
-              false
+              windowFromDocument(e.view.document),
+              (link) => {
+                const isNew = !props.superstate.pathsIndex.has(link);
+                if (isNew) {
+                  createSpace(props.superstate, link, {}).then((f) => {
+                    saveActiveSpace(link);
+                    props.superstate.ui.openPath(link, false);
+                  });
+                  return;
+                }
+                saveActiveSpace(link);
+              }
             );
           }}
         >

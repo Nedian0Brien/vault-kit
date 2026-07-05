@@ -24,12 +24,6 @@ export type SelectMenuProps = {
   isDisclosure?: boolean;
   wrapperClass?: string;
   onSelectSection?: (section: string) => void;
-  floatingSearch?: {
-    value: string;
-    placeholder: string;
-    onChange: (value: string) => void;
-    autoFocus?: boolean;
-  };
 };
 
 export enum SelectOptionType {
