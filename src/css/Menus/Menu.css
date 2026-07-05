@@ -113,7 +113,7 @@ body.is-mobile {
 
 .vaultkit-native-search-pill {
   position: fixed;
-  z-index: calc(var(--layer-menu) + calc(var(--drawer-index) * 2) + 3);
+  z-index: calc(var(--layer-menu) + calc(var(--drawer-index, 0) * 2) + 3);
   box-sizing: border-box;
   height: 44px;
   padding: 0 14px;

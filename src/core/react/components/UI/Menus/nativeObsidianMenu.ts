@@ -107,6 +107,10 @@ const attachFloatingSearch = (
     search.style.width = `${width}px`;
   };
   const onInput = () => optionProps.floatingSearch?.onChange(search.value);
+  const menuZIndex = Number.parseInt(win.getComputedStyle(menu.dom).zIndex, 10);
+  if (Number.isFinite(menuZIndex)) {
+    search.style.zIndex = `${menuZIndex + 2}`;
+  }
 
   search.addEventListener("pointerdown", stopMenuEvent);
   search.addEventListener("click", stopMenuEvent);
@@ -117,6 +121,10 @@ const attachFloatingSearch = (
   win.visualViewport?.addEventListener("scroll", syncPosition);
   win.document.body.appendChild(search);
   syncPosition();
+  logNativeMenu("show:floating-search:attached", {
+    zIndex: search.style.zIndex || null,
+    valueLength: optionProps.floatingSearch.value.length,
+  });
   if (optionProps.floatingSearch.autoFocus) {
     win.setTimeout(() => search.focus({ preventScroll: true }), 0);
   }

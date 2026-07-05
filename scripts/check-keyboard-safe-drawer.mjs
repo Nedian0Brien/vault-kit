@@ -252,10 +252,12 @@ const checks = [
       !nativeObsidianMenu.includes("option.nativeSearch") &&
       nativeObsidianMenu.includes("attachFloatingSearch") &&
       nativeObsidianMenu.includes("document.body.appendChild(search)") &&
+      nativeObsidianMenu.includes("menuZIndex + 2") &&
       !nativeObsidianMenu.includes("setTitle(search)") &&
       !nativeObsidianMenu.includes("vaultkit-native-search-input") &&
       !menuCss.includes(".vaultkit-native-search-input") &&
-      menuCss.includes(".vaultkit-native-search-pill"),
+      menuCss.includes(".vaultkit-native-search-pill") &&
+      menuCss.includes("var(--drawer-index, 0)"),
   },
   {
     name: "sticker palette incrementally loads large sticker sets",
