@@ -182,6 +182,9 @@ const checks = [
       /isOpeningSubmenu = true;[\s\S]*hideParent\(\);[\s\S]*win\.setTimeout/.test(
         nativeObsidianMenu
       ) &&
+      /const nextMenu = openSubmenu[\s\S]*submenu = nextMenu;[\s\S]*finally \{[\s\S]*isOpeningSubmenu = false;/.test(
+        nativeObsidianMenu
+      ) &&
       nativeObsidianMenu.includes(
         "if (submenu || isComplete || isOpeningSubmenu) return;"
       ),

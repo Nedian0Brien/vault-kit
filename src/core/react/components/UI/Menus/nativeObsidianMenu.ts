@@ -317,8 +317,10 @@ export const showNativeObsidianMenu = (
           isOpeningSubmenu = true;
           hideParent();
           win.setTimeout(() => {
-            isOpeningSubmenu = false;
-            if (isComplete) return;
+            if (isComplete) {
+              isOpeningSubmenu = false;
+              return;
+            }
             logNativeMenu("item:submenu-open:deferred", {
               option: optionSample(option),
               parentOptionCount: optionProps.options.length,
@@ -333,6 +335,8 @@ export const showNativeObsidianMenu = (
                 error,
               });
               hide(false);
+            } finally {
+              isOpeningSubmenu = false;
             }
           }, 0);
           return;
