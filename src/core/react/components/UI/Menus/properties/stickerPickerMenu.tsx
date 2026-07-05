@@ -22,36 +22,34 @@ const hashStickerValue = (value: string) => {
   return Math.abs(hash).toString(36);
 };
 
-const escapeSvgText = (value: string) =>
-  value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-const stickerTextSvg = (text: string) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" font-size="20">${escapeSvgText(
-    text
-  )}</text></svg>`;
-
-const normalizeStickerSvg = (svg: string) =>
-  svg
-    .replace(/\s(width|height)="[^"]*"/g, "")
-    .replace("<svg", '<svg width="24" height="24"');
+const scaleStickerSvg = (svg: string) => {
+  const trimmed = svg.trim();
+  const viewBox = trimmed.match(/\sviewBox="([^"]+)"/)?.[1] ?? "0 0 24 24";
+  const inner = trimmed
+    .replace(/^<svg\b[^>]*>/i, "")
+    .replace(/<\/svg>\s*$/i, "");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="${viewBox}"><g transform="translate(-2.4 -2.4) scale(1.2)">${inner}</g></svg>`;
+};
 
 const registerStickerPreviewIcon = (sticker: Sticker) => {
+  if (sticker.type == "emoji") return null;
+
   const iconId = `vaultkit-sticker-preview-${hashStickerValue(
     stickerValue(sticker)
   )}`;
   if (stickerPreviewIconIds.has(iconId)) return iconId;
 
-  const html = sticker.type == "emoji" ? emojiFromString(sticker.html) : sticker.html;
-  const svg = html.trim().startsWith("<svg")
-    ? normalizeStickerSvg(html)
-    : stickerTextSvg(html);
-  addIcon(iconId, svg);
+  if (!sticker.html.trim().startsWith("<svg")) return null;
+
+  addIcon(iconId, scaleStickerSvg(sticker.html));
   stickerPreviewIconIds.add(iconId);
   return iconId;
 };
+
+const stickerMenuName = (sticker: Sticker) =>
+  sticker.type == "emoji"
+    ? `${emojiFromString(sticker.html)} ${sticker.name}`
+    : sticker.name;
 
 const openStickerPalette = (
   superstate: Superstate,
@@ -75,8 +73,8 @@ const showNativeStickerCategoryMenu = (
     .filter((sticker) => sticker.type == category)
     .map(
       (sticker): SelectOption => ({
-        name: sticker.name,
-        icon: registerStickerPreviewIcon(sticker),
+        name: stickerMenuName(sticker),
+        icon: registerStickerPreviewIcon(sticker) ?? "ui//sticker",
         onClick: () => selectedSticker(stickerValue(sticker)),
       })
     );

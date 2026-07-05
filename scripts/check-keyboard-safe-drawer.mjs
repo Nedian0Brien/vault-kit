@@ -200,11 +200,18 @@ const checks = [
     name: "native mobile sticker picker uses sticker preview icons",
     pass:
       stickerPickerMenu.includes("registerStickerPreviewIcon") &&
-      stickerPickerMenu.includes("addIcon(iconId, svg)") &&
+      stickerPickerMenu.includes("addIcon(iconId, scaleStickerSvg(sticker.html))") &&
       stickerPickerMenu.includes("vaultkit-sticker-preview") &&
       stickerPickerMenu.includes("icon: registerStickerPreviewIcon(sticker)") &&
-      stickerPickerMenu.includes('font-size="20"') &&
-      stickerPickerMenu.includes("normalizeStickerSvg"),
+      stickerPickerMenu.includes("scaleStickerSvg") &&
+      stickerPickerMenu.includes('scale(1.2)'),
+  },
+  {
+    name: "native mobile sticker picker avoids emoji addIcon crash path",
+    pass:
+      stickerPickerMenu.includes('if (sticker.type == "emoji") return null') &&
+      stickerPickerMenu.includes("stickerMenuName") &&
+      stickerPickerMenu.includes("emojiFromString(sticker.html)"),
   },
 ];
 
