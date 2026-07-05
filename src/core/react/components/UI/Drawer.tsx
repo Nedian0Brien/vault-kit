@@ -1,6 +1,45 @@
 import classNames from "classnames";
 import React, { cloneElement, useMemo } from "react";
 import { Drawer } from "vaul";
+
+type MobileDrawerViewportStyle = React.CSSProperties & {
+  "--mk-visual-viewport-height": string;
+  "--mk-visual-viewport-offset-top": string;
+  "--mk-keyboard-inset-bottom": string;
+};
+
+const mobileDrawerViewportStyleKeys = [
+  "--mk-visual-viewport-height",
+  "--mk-visual-viewport-offset-top",
+  "--mk-keyboard-inset-bottom",
+] as const;
+
+const getMobileDrawerWindow = () => document.defaultView ?? window;
+
+const getMobileDrawerViewportStyle = (
+  win: Window
+): MobileDrawerViewportStyle => {
+  const viewport = win.visualViewport;
+  const height = Math.round(viewport?.height ?? win.innerHeight);
+  const offsetTop = Math.round(viewport?.offsetTop ?? 0);
+  const keyboardInset = Math.max(
+    0,
+    Math.round(win.innerHeight - height - offsetTop)
+  );
+
+  return {
+    "--mk-visual-viewport-height": `${height}px`,
+    "--mk-visual-viewport-offset-top": `${offsetTop}px`,
+    "--mk-keyboard-inset-bottom": `${keyboardInset}px`,
+  };
+};
+
+const isSameMobileDrawerViewportStyle = (
+  current: MobileDrawerViewportStyle,
+  next: MobileDrawerViewportStyle
+) =>
+  mobileDrawerViewportStyleKeys.every((key) => current[key] === next[key]);
+
 export const MobileDrawer = (props: {
   fc: JSX.Element;
   title?: string;
@@ -12,9 +51,10 @@ export const MobileDrawer = (props: {
 }) => {
   const { newProps } = props;
   const [open, setOpen] = React.useState(true);
-  const [viewportStyle, setViewportStyle] = React.useState<React.CSSProperties>(
-    {}
-  );
+  const [viewportStyle, setViewportStyle] =
+    React.useState<MobileDrawerViewportStyle>(() =>
+      getMobileDrawerViewportStyle(getMobileDrawerWindow())
+    );
   const drawerCount = useMemo(() => {
     const drawers = document.querySelectorAll(".mk-drawer-content");
     let drawerIndex = 0;
@@ -28,22 +68,16 @@ export const MobileDrawer = (props: {
     });
     return drawerIndex;
   }, []);
-  React.useEffect(() => {
-    const win = document.defaultView ?? window;
+  React.useLayoutEffect(() => {
+    const win = getMobileDrawerWindow();
     const viewport = win.visualViewport;
     const updateViewportStyle = () => {
-      const height = Math.round(viewport?.height ?? win.innerHeight);
-      const offsetTop = Math.round(viewport?.offsetTop ?? 0);
-      const keyboardInset = Math.max(
-        0,
-        Math.round(win.innerHeight - height - offsetTop)
+      const nextStyle = getMobileDrawerViewportStyle(win);
+      setViewportStyle((currentStyle) =>
+        isSameMobileDrawerViewportStyle(currentStyle, nextStyle)
+          ? currentStyle
+          : nextStyle
       );
-
-      setViewportStyle({
-        "--mk-visual-viewport-height": `${height}px`,
-        "--mk-visual-viewport-offset-top": `${offsetTop}px`,
-        "--mk-keyboard-inset-bottom": `${keyboardInset}px`,
-      } as React.CSSProperties);
     };
 
     updateViewportStyle();

@@ -119,7 +119,7 @@ body.is-mobile {
   box-shadow: var(--mk-shadow-menu);
   background: var(--mk-ui-background);
   z-index: calc(var(--layer-menu) + calc(var(--drawer-index) * 2) + 1);
-  max-height: 96%;
+  max-height: min(96%, calc(var(--mk-visual-viewport-height, 100vh) - 24px));
   width: 100%;
   margin-top: 24px;
   left: 0;

@@ -61,6 +61,23 @@ const checks = [
     pass: drawer.includes("--mk-keyboard-inset-bottom"),
   },
   {
+    name: "MobileDrawer computes viewport style before first paint",
+    pass:
+      drawer.includes("getMobileDrawerViewportStyle") &&
+      /useState<MobileDrawerViewportStyle>\(\(\) =>\s*getMobileDrawerViewportStyle/.test(
+        drawer
+      ) &&
+      drawer.includes("React.useLayoutEffect"),
+  },
+  {
+    name: "MobileDrawer avoids redundant viewport style updates",
+    pass:
+      drawer.includes("isSameMobileDrawerViewportStyle") &&
+      /setViewportStyle\(\(currentStyle\) =>[\s\S]*currentStyle[\s\S]*nextStyle/.test(
+        drawer
+      ),
+  },
+  {
     name: "MobileDrawer updates on viewport resize",
     pass: drawer.includes('addEventListener("resize"'),
   },
@@ -150,6 +167,13 @@ const checks = [
     name: "mobile drawer modal caps height to visual viewport",
     pass:
       /\.mk-drawer-content\.mk-drawer-modal[\s\S]*--mk-visual-viewport-height/.test(
+        menuCss
+      ),
+  },
+  {
+    name: "mobile drawer content caps height to visual viewport",
+    pass:
+      /\.mk-drawer-content\s*\{[\s\S]*max-height:\s*min\(96%,\s*calc\(var\(--mk-visual-viewport-height/.test(
         menuCss
       ),
   },
