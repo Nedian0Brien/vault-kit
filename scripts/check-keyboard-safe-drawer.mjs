@@ -204,63 +204,19 @@ const checks = [
       !colorPickerMenu.includes('fill="${fill}" stroke='),
   },
   {
-    name: "mobile sticker picker offers native Obsidian menu categories",
+    name: "mobile sticker picker uses the palette instead of native Obsidian menu",
     pass:
       stickerPickerMenu.includes("showStickerPickerMenu") &&
-      stickerPickerMenu.includes("isPhone(superstate.ui)") &&
-      stickerPickerMenu.includes("SelectOptionType.Submenu") &&
-      stickerPickerMenu.includes("showNativeStickerCategoryMenu") &&
-      stickerPickerMenu.includes("openStickerPalette"),
-  },
-  {
-    name: "native mobile sticker picker uses Obsidian-native lucide icons",
-    pass:
-      stickerPickerMenu.includes("nativeStickerIcon") &&
-      stickerPickerMenu.includes('sticker.type == "lucide"') &&
-      stickerPickerMenu.includes("`lucide//${sticker.value}`") &&
-      stickerPickerMenu.includes("icon: nativeStickerIcon(sticker)") &&
-      !stickerPickerMenu.includes("registerStickerPreviewIcon") &&
-      !stickerPickerMenu.includes("addIcon("),
-  },
-  {
-    name: "native mobile sticker picker keeps emoji out of native icon path",
-    pass:
-      stickerPickerMenu.includes("stickerMenuName") &&
-      stickerPickerMenu.includes("emojiFromString(sticker.value)") &&
-      stickerPickerMenu.includes("nativeStickerIcon(sticker)") &&
-      stickerPickerMenu.includes('sticker.type == "lucide"') &&
-      !stickerPickerMenu.includes("addIcon("),
-  },
-  {
-    name: "mobile sticker native drawer pages large sticker categories",
-    pass:
-      stickerPickerMenu.includes("const NATIVE_STICKER_BATCH_SIZE = 100") &&
-      stickerPickerMenu.includes("visibleCount = NATIVE_STICKER_BATCH_SIZE") &&
-      stickerPickerMenu.includes("categoryStickers.slice(0, visibleCount)") &&
-      stickerPickerMenu.includes("i18n.labels.loadMore") &&
-      stickerPickerMenu.includes(
-        "visibleCount + NATIVE_STICKER_BATCH_SIZE"
-      ) &&
-      stickerPickerMenu.includes("autoLoadMore: true") &&
-      nativeObsidianMenu.includes("attachAutoLoadMoreScroll") &&
-      nativeObsidianMenu.includes("findScrollableMenuElement") &&
-      nativeObsidianMenu.includes("distanceFromBottom > 96") &&
-      menuTypes.includes("autoLoadMore?: boolean") &&
-      !stickerPickerMenu.includes('if (category == "emoji")'),
-  },
-  {
-    name: "native sticker category drawer keeps the v1.3.24 option shape",
-    pass:
-      stickerPickerMenu.includes("const options = visibleStickers.map") &&
-      stickerPickerMenu.includes("showNativeStickerCategoryMenu(") &&
-      stickerPickerMenu.includes("category: string,") &&
-      stickerPickerMenu.includes("onClick: () => openStickerPalette(superstate, win, selectedSticker)") &&
+      stickerPickerMenu.includes("StickerModal") &&
+      stickerPickerMenu.includes("): MenuObject => openStickerPalette(superstate, win, selectedSticker)") &&
+      !stickerPickerMenu.includes("isPhone(superstate.ui)") &&
+      !stickerPickerMenu.includes("SelectOptionType.Submenu") &&
+      !stickerPickerMenu.includes("showNativeStickerCategoryMenu") &&
+      !stickerPickerMenu.includes("NATIVE_STICKER_BATCH_SIZE") &&
+      !stickerPickerMenu.includes("nativeStickerIcon") &&
+      !stickerPickerMenu.includes("emojiFromString") &&
       !stickerPickerMenu.includes("nativeSearch") &&
-      !stickerPickerMenu.includes("matchesStickerQuery") &&
-      !stickerPickerMenu.includes("openStickerPalette(superstate, win, selectedSticker, category)") &&
-      !stickerPickerMenu.includes("noIcon: category") &&
-      !nativeObsidianMenu.includes("menu.setNoIcon()") &&
-      !menuTypes.includes("noIcon?: boolean"),
+      !stickerPickerMenu.includes("noIcon"),
   },
   {
     name: "native mobile menu does not embed input elements inside Obsidian Menu",
