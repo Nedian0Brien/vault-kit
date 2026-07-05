@@ -238,6 +238,17 @@ const checks = [
       !stickerPickerMenu.includes('if (category == "emoji")'),
   },
   {
+    name: "native sticker category drawer has back search and emoji spacing",
+    pass:
+      stickerPickerMenu.includes("i18n.labels.back") &&
+      stickerPickerMenu.includes("lucide//chevron-left") &&
+      stickerPickerMenu.includes("i18n.labels.findStickers") &&
+      stickerPickerMenu.includes("openStickerPalette(superstate, win, selectedSticker, category)") &&
+      stickerPickerMenu.includes("noIcon: category == \"emoji\"") &&
+      nativeObsidianMenu.includes("if (optionProps.noIcon) menu.setNoIcon()") &&
+      menuTypes.includes("noIcon?: boolean"),
+  },
+  {
     name: "sticker palette incrementally loads large sticker sets",
     pass:
       stickerModal.includes("const STICKER_PAGE_SIZE = 100") &&

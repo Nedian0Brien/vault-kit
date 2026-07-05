@@ -24,6 +24,7 @@ export type SelectMenuProps = {
   isDisclosure?: boolean;
   wrapperClass?: string;
   onSelectSection?: (section: string) => void;
+  noIcon?: boolean;
 };
 
 export enum SelectOptionType {

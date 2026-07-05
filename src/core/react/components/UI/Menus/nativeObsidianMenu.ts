@@ -152,6 +152,7 @@ export const showNativeObsidianMenu = (
   onHide?: () => void
 ): MenuObject => {
   const menu = new Menu();
+  if (optionProps.noIcon) menu.setNoIcon();
   let isComplete = false;
   let isParentHidden = false;
   let submenu: { hide: (suppress?: boolean) => void } | null = null;

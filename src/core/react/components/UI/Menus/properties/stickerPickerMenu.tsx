@@ -70,12 +70,30 @@ const showNativeStickerCategoryMenu = (
     sample: visibleStickers.slice(0, 5).map(stickerSample),
   });
 
-  const options = visibleStickers.map(
-    (sticker): SelectOption => ({
-      name: stickerMenuName(sticker),
-      icon: nativeStickerIcon(sticker),
-      onClick: () => selectedSticker(stickerValue(sticker)),
-    })
+  const options: SelectOption[] = [
+    {
+      name: i18n.labels.back,
+      icon: "lucide//chevron-left",
+      onClick: () =>
+        showStickerPickerMenu(superstate, rect, win, selectedSticker),
+    },
+    {
+      name: i18n.labels.findStickers,
+      icon: "ui//search",
+      onClick: () =>
+        openStickerPalette(superstate, win, selectedSticker, category),
+    },
+    menuSeparator,
+  ];
+
+  options.push(
+    ...visibleStickers.map(
+      (sticker): SelectOption => ({
+        name: stickerMenuName(sticker),
+        icon: nativeStickerIcon(sticker),
+        onClick: () => selectedSticker(stickerValue(sticker)),
+      })
+    )
   );
 
   if (visibleStickers.length < categoryStickers.length) {
@@ -108,7 +126,10 @@ const showNativeStickerCategoryMenu = (
   try {
     const menu = superstate.ui.openMenu(
       rect,
-      defaultMenu(superstate.ui, options),
+      {
+        ...defaultMenu(superstate.ui, options),
+        noIcon: category == "emoji",
+      },
       win,
       "bottom"
     );
