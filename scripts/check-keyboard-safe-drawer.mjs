@@ -16,6 +16,10 @@ const selectMenuComponent = fs.readFileSync(
   "src/core/react/components/UI/Menus/menu/SelectMenuComponent.tsx",
   "utf8"
 );
+const selectMenuInput = fs.readFileSync(
+  "src/core/react/components/UI/Menus/menu/SelectMenuInput.tsx",
+  "utf8"
+);
 const menu = fs.readFileSync("src/core/react/components/UI/Menus/menu.tsx", "utf8");
 const selectMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/selectMenu.tsx",
@@ -32,6 +36,10 @@ const colorPickerMenu = fs.readFileSync(
 );
 const selectSpaceMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/properties/selectSpaceMenu.tsx",
+  "utf8"
+);
+const newSpacePropertyMenu = fs.readFileSync(
+  "src/core/react/components/UI/Menus/contexts/newSpacePropertyMenu.tsx",
   "utf8"
 );
 const stickerPickerMenu = fs.readFileSync(
@@ -189,6 +197,22 @@ const checks = [
     pass:
       /\.mk-drawer-content \.mk-menu-suggestions\s*\{[\s\S]*flex:\s*0 1 auto[\s\S]*min-height:\s*0/.test(
         menuCss
+      ),
+  },
+  {
+    name: "mobile select menu input does not autofocus and trigger Vaul keyboard resize",
+    pass:
+      selectMenuInput.includes("isPhone") &&
+      /if \(!isPhone\(props\.ui\)\) \{[\s\S]*input\.current\?\.focus\(\)/.test(
+        selectMenuInput
+      ),
+  },
+  {
+    name: "mobile new property drawer input does not autofocus and trigger Vaul keyboard resize",
+    pass:
+      newSpacePropertyMenu.includes("isPhone") &&
+      /if \(!isPhone\(props\.superstate\.ui\)\) \{[\s\S]*input\.current\?\.focus\(\)/.test(
+        newSpacePropertyMenu
       ),
   },
   {

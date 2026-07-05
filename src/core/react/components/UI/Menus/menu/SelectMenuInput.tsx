@@ -1,3 +1,4 @@
+import { isPhone } from "core/utils/ui/screen";
 import { SelectSection, UIManager } from "makemd-core";
 import React, {
   CSSProperties,
@@ -50,7 +51,9 @@ const SelectMenuSearch = forwardRef(
       copyInputStyles();
       updateInputWidth();
       setTimeout(() => {
-        input.current?.focus();
+        if (!isPhone(props.ui)) {
+          input.current?.focus();
+        }
       }, 50);
     }, []);
 

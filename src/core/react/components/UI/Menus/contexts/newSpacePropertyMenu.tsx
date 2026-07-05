@@ -4,6 +4,7 @@ import { FMMetadataKeys } from "core/types/space";
 import { RepeatTemplate } from "core/utils/contexts/fields/presets";
 import { nameForField } from "core/utils/frames/frames";
 import { allPropertiesForPaths } from "core/utils/properties/allProperties";
+import { isPhone } from "core/utils/ui/screen";
 import { SelectOption, SelectOptionType, Superstate } from "makemd-core";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { fieldTypeForType, fieldTypes, stickerForField } from "schemas/mdb";
@@ -201,7 +202,9 @@ const NewPropertyMenuComponent = (
   };
   useEffect(() => {
     setTimeout(() => {
-      input.current?.focus();
+      if (!isPhone(props.superstate.ui)) {
+        input.current?.focus();
+      }
     }, 50);
   }, []);
   const input = useRef(null);
