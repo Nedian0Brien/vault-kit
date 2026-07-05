@@ -205,6 +205,7 @@ export const showMenu = (props: {
           hide={(supress?: boolean) => hide(supress)}
           newProps={newProps}
           className={classNames("mk-drawer-menu", props.className)}
+          scaleBackground={false}
         ></MobileDrawer>
       );
       return;

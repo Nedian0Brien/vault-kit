@@ -16,6 +16,7 @@ const selectMenuComponent = fs.readFileSync(
   "src/core/react/components/UI/Menus/menu/SelectMenuComponent.tsx",
   "utf8"
 );
+const menu = fs.readFileSync("src/core/react/components/UI/Menus/menu.tsx", "utf8");
 
 const checks = [
   {
@@ -42,6 +43,12 @@ const checks = [
   {
     name: "mobile modals do not scale the Obsidian app container",
     pass: /<MobileDrawer[\s\S]*scaleBackground={false}/.test(modal),
+  },
+  {
+    name: "mobile menu drawers do not scale the Obsidian app container",
+    pass: /<MobileDrawer[\s\S]*className={classNames\("mk-drawer-menu"[\s\S]*scaleBackground={false}/.test(
+      menu
+    ),
   },
   {
     name: "mobile input modals render as centered modal wrappers",
