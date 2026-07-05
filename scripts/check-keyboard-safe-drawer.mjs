@@ -90,21 +90,35 @@ const checks = [
     pass: drawer.includes('addEventListener("resize"'),
   },
   {
-    name: "MobileDrawer does not shrink compact drawers with Vaul fixed mode",
-    pass: !/<Drawer\.Root[\s\S]*\bfixed\b[\s\S]*>/.test(drawer),
+    name: "MobileDrawer does not use Vaul for mobile bottom sheet geometry",
+    pass:
+      !drawer.includes('from "vaul"') &&
+      !drawer.includes("<Drawer.Root") &&
+      !drawer.includes("<Drawer.Content"),
   },
   {
-    name: "MobileDrawer can disable background scaling",
-    pass: drawer.includes("scaleBackground?: boolean") &&
-      drawer.includes("shouldScaleBackground={props.scaleBackground ?? true}"),
+    name: "MobileDrawer preserves background scaling API compatibility",
+    pass: drawer.includes("scaleBackground?: boolean"),
   },
   {
-    name: "MobileDrawer can disable Vaul scroll prevention",
+    name: "MobileDrawer preserves scroll prevention API compatibility",
     pass:
       drawer.includes("disablePreventScroll?: boolean") &&
-      drawer.includes(
-        "disablePreventScroll={props.disablePreventScroll ?? false}"
-      ),
+      !drawer.includes("disablePreventScroll={props.disablePreventScroll"),
+  },
+  {
+    name: "MobileDrawer measures content before opening animation",
+    pass:
+      drawer.includes('MobileDrawerPhase = "measuring" | "open"') &&
+      drawer.includes("contentRef") &&
+      drawer.includes("getBoundingClientRect().height") &&
+      drawer.includes("requestAnimationFrame"),
+  },
+  {
+    name: "MobileDrawer locks measured content height during enter animation",
+    pass:
+      drawer.includes("drawerHeight") &&
+      /height:\s*`\$\{drawerHeight\}px`/.test(drawer),
   },
   {
     name: "mobile modals do not scale the Obsidian app container",
@@ -200,11 +214,11 @@ const checks = [
       ),
   },
   {
-    name: "phone drawer menus cannot keep an inline full-screen height",
+    name: "phone drawer menus use measured height instead of CSS full-screen override",
     pass:
-      /\.is-phone \.mk-drawer-content\.mk-drawer-menu\s*\{[\s\S]*height:\s*auto !important[\s\S]*top:\s*auto !important[\s\S]*max-height:[\s\S]*!important/.test(
+      !/\.is-phone \.mk-drawer-content\.mk-drawer-menu\s*\{[\s\S]*height:\s*auto !important/.test(
         menuCss
-      ),
+      ) && /\.mk-drawer-content\.mk-drawer-measuring/.test(menuCss),
   },
   {
     name: "phone drawer menu suggestions override phone flex stretch",

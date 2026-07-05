@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import React, { cloneElement, useMemo } from "react";
-import { Drawer } from "vaul";
 
 type MobileDrawerViewportStyle = React.CSSProperties & {
   "--mk-visual-viewport-height": string;
@@ -40,6 +39,8 @@ const isSameMobileDrawerViewportStyle = (
 ) =>
   mobileDrawerViewportStyleKeys.every((key) => current[key] === next[key]);
 
+type MobileDrawerPhase = "measuring" | "open";
+
 export const MobileDrawer = (props: {
   fc: JSX.Element;
   title?: string;
@@ -50,7 +51,10 @@ export const MobileDrawer = (props: {
   disablePreventScroll?: boolean;
 }) => {
   const { newProps } = props;
-  const [open, setOpen] = React.useState(true);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const [drawerPhase, setDrawerPhase] =
+    React.useState<MobileDrawerPhase>("measuring");
+  const [drawerHeight, setDrawerHeight] = React.useState<number>();
   const [viewportStyle, setViewportStyle] =
     React.useState<MobileDrawerViewportStyle>(() =>
       getMobileDrawerViewportStyle(getMobileDrawerWindow())
@@ -92,56 +96,77 @@ export const MobileDrawer = (props: {
     };
   }, []);
 
+  React.useLayoutEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+
+    const viewportHeight = parseInt(
+      viewportStyle["--mk-visual-viewport-height"],
+      10
+    );
+    const maxHeight = Math.max(0, (viewportHeight || window.innerHeight) - 24);
+    const measuredHeight = Math.min(
+      Math.ceil(content.getBoundingClientRect().height),
+      maxHeight
+    );
+
+    setDrawerHeight((currentHeight) =>
+      currentHeight === measuredHeight ? currentHeight : measuredHeight
+    );
+
+    const animationFrame = requestAnimationFrame(() => {
+      setDrawerPhase("open");
+    });
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [viewportStyle]);
+
+  const hideDrawer = (supress?: boolean) => {
+    props.hide(supress);
+  };
+
   return (
-    <Drawer.Root
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-      }}
-      shouldScaleBackground={props.scaleBackground ?? true}
-      disablePreventScroll={props.disablePreventScroll ?? false}
-      onClose={() => {
-        setOpen(false);
-        props.hide(true);
-      }}
-      noBodyStyles
-    >
-      <Drawer.Portal>
-        <Drawer.Content
-          className={classNames("mk-drawer-content", props.className)}
-          data-drawer-index={drawerCount}
-          style={
-            {
-              "--drawer-index": drawerCount,
-              ...viewportStyle,
-            } as React.CSSProperties
-          }
-        >
-          <Drawer.Handle className="mk-drawer-handle" />
-          <Drawer.Title
-            className="mk-drawer-title"
-            hidden={!(props.title?.length > 0)}
-          >
-            {props.title}
-          </Drawer.Title>
-          {cloneElement(props.fc, {
-            hide: (supress?: boolean) => {
-              setOpen(false);
-              props.hide(supress);
-            },
-            ...newProps,
-          })}
-        </Drawer.Content>
-        <Drawer.Overlay
-          className="mk-drawer-overlay"
-          style={
-            {
-              "--drawer-index": drawerCount,
-              ...viewportStyle,
-            } as React.CSSProperties
-          }
-        />
-      </Drawer.Portal>
-    </Drawer.Root>
+    <>
+      <div
+        className={classNames("mk-drawer-overlay", {
+          "mk-drawer-open": drawerPhase === "open",
+        })}
+        onMouseDown={() => hideDrawer(true)}
+        style={
+          {
+            "--drawer-index": drawerCount,
+            ...viewportStyle,
+          } as React.CSSProperties
+        }
+      />
+      <div
+        ref={contentRef}
+        className={classNames("mk-drawer-content", props.className, {
+          "mk-drawer-measuring": drawerPhase === "measuring",
+          "mk-drawer-open": drawerPhase === "open",
+        })}
+        data-drawer-index={drawerCount}
+        role="dialog"
+        aria-modal="true"
+        style={
+          {
+            "--drawer-index": drawerCount,
+            ...(drawerHeight ? { height: `${drawerHeight}px` } : {}),
+            ...viewportStyle,
+          } as React.CSSProperties
+        }
+      >
+        <div className="mk-drawer-handle" />
+        <div className="mk-drawer-title" hidden={!(props.title?.length > 0)}>
+          {props.title}
+        </div>
+        {cloneElement(props.fc, {
+          hide: (supress?: boolean) => {
+            hideDrawer(supress);
+          },
+          ...newProps,
+        })}
+      </div>
+    </>
   );
 };
