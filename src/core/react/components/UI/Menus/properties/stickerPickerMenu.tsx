@@ -20,14 +20,6 @@ const stickerMenuName = (sticker: Sticker) =>
     ? `${emojiFromString(sticker.value)} ${sticker.name}`
     : sticker.name;
 
-const matchesStickerQuery = (sticker: Sticker, query: string) => {
-  const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) return true;
-  return [sticker.name, sticker.value, sticker.keywords].some((value) =>
-    value.toLowerCase().includes(normalizedQuery)
-  );
-};
-
 const logStickerPicker = (message: string, data?: Record<string, unknown>) => {
   console.log("[VaultKit][sticker-picker]", message, data ?? {});
 };
@@ -60,22 +52,17 @@ const showNativeStickerCategoryMenu = (
   superstate: Superstate,
   rect: Rect,
   win: Window,
-  category: string | null,
+  category: string,
   selectedSticker: (sticker: string) => void,
-  visibleCount = NATIVE_STICKER_BATCH_SIZE,
-  query = "",
-  focusSearch = false
+  visibleCount = NATIVE_STICKER_BATCH_SIZE
 ): MenuObject => {
   const allStickers = superstate.ui.allStickers();
   const categoryStickers = allStickers.filter(
-    (sticker) =>
-      (category == null || sticker.type == category) &&
-      matchesStickerQuery(sticker, query)
+    (sticker) => sticker.type == category
   );
   const visibleStickers = categoryStickers.slice(0, visibleCount);
   logStickerPicker("category:build-options:start", {
-    category: category ?? "all",
-    query,
+    category,
     allCount: allStickers.length,
     categoryCount: categoryStickers.length,
     visibleCount: visibleStickers.length,
@@ -83,43 +70,12 @@ const showNativeStickerCategoryMenu = (
     sample: visibleStickers.slice(0, 5).map(stickerSample),
   });
 
-  const options: SelectOption[] = [
-    {
-      name: i18n.labels.back,
-      icon: "lucide//chevron-left",
-      onClick: () =>
-        showStickerPickerMenu(superstate, rect, win, selectedSticker),
-    },
-    {
-      name: i18n.labels.findStickers,
-      nativeSearch: {
-        value: query,
-        placeholder: i18n.labels.findStickers,
-        autoFocus: focusSearch,
-        onChange: (value) =>
-          showNativeStickerCategoryMenu(
-            superstate,
-            rect,
-            win,
-            category,
-            selectedSticker,
-            NATIVE_STICKER_BATCH_SIZE,
-            value,
-            true
-          ),
-      },
-    },
-    menuSeparator,
-  ];
-
-  options.push(
-    ...visibleStickers.map(
-      (sticker): SelectOption => ({
-        name: stickerMenuName(sticker),
-        icon: nativeStickerIcon(sticker),
-        onClick: () => selectedSticker(stickerValue(sticker)),
-      })
-    )
+  const options = visibleStickers.map(
+    (sticker): SelectOption => ({
+      name: stickerMenuName(sticker),
+      icon: nativeStickerIcon(sticker),
+      onClick: () => selectedSticker(stickerValue(sticker)),
+    })
   );
 
   if (visibleStickers.length < categoryStickers.length) {
@@ -135,16 +91,13 @@ const showNativeStickerCategoryMenu = (
           win,
           category,
           selectedSticker,
-          visibleCount + NATIVE_STICKER_BATCH_SIZE,
-          query,
-          focusSearch
+          visibleCount + NATIVE_STICKER_BATCH_SIZE
         ),
     });
   }
 
   logStickerPicker("category:open-menu:before", {
-    category: category ?? "all",
-    query,
+    category,
     optionCount: options.length,
     visibleCount: visibleStickers.length,
     totalCount: categoryStickers.length,
@@ -160,13 +113,13 @@ const showNativeStickerCategoryMenu = (
       "bottom"
     );
     logStickerPicker("category:open-menu:after", {
-      category: category ?? "all",
+      category,
       optionCount: options.length,
     });
     return menu;
   } catch (error) {
     console.error("[VaultKit][sticker-picker] category:open-menu:error", {
-      category: category ?? "all",
+      category,
       optionCount: options.length,
       error,
     });
@@ -203,15 +156,7 @@ export const showStickerPickerMenu = (
     {
       name: i18n.labels.findStickers,
       icon: "ui//search",
-      type: SelectOptionType.Submenu,
-      onSubmenu: (offset) =>
-        showNativeStickerCategoryMenu(
-          superstate,
-          offset,
-          win,
-          null,
-          selectedSticker
-        ),
+      onClick: () => openStickerPalette(superstate, win, selectedSticker),
     },
   ];
 

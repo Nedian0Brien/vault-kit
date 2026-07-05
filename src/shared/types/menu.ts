@@ -57,12 +57,6 @@ export enum SelectOptionType {
     section?: string;
     description?: string;
     icon?: string;
-    nativeSearch?: {
-      value: string;
-      placeholder: string;
-      autoFocus?: boolean;
-      onChange: (value: string) => void;
-    };
     autoLoadMore?: boolean;
     sortable?: boolean;
     removeable?: boolean;

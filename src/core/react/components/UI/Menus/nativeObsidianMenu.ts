@@ -33,7 +33,6 @@ const optionSample = (option: SelectOption) => ({
   disabled: Boolean(option.disabled),
   hasSubmenu: Boolean(option.onSubmenu),
   autoLoadMore: Boolean(option.autoLoadMore),
-  nativeSearch: Boolean(option.nativeSearch),
 });
 
 const findScrollableMenuElement = (menuEl: HTMLElement, win: Window) => {
@@ -104,7 +103,6 @@ const toReactMouseEvent = (
 };
 
 const canRenderOptionNatively = (option: SelectOption) => {
-  if (option.nativeSearch) return true;
   if (
     option.fragment ||
     option.onMoreOptions ||
@@ -159,7 +157,6 @@ export const showNativeObsidianMenu = (
   let submenu: { hide: (suppress?: boolean) => void } | null = null;
   let removeAutoLoadMoreScroll: (() => void) | null = null;
   let autoLoadMoreTriggered = false;
-  let nativeSearchTimeout: number | null = null;
   logNativeMenu("show:start", {
     optionCount: optionProps.options.length,
     anchor: defaultAnchor,
@@ -176,10 +173,6 @@ export const showNativeObsidianMenu = (
   const hide = (suppress?: boolean) => {
     if (isComplete) return;
     isComplete = true;
-    if (nativeSearchTimeout != null) {
-      win.clearTimeout(nativeSearchTimeout);
-      nativeSearchTimeout = null;
-    }
     removeAutoLoadMoreScroll?.();
     removeAutoLoadMoreScroll = null;
     if (submenu) submenu.hide(true);
@@ -251,42 +244,6 @@ export const showNativeObsidianMenu = (
     }
     if (option.type == SelectOptionType.Separator) {
       menu.addSeparator();
-      return;
-    }
-
-    if (option.nativeSearch) {
-      menu.addItem((item) => {
-        const wrapper = win.document.createDocumentFragment();
-        const search = win.document.createElement("input");
-        search.type = "search";
-        search.value = option.nativeSearch?.value ?? "";
-        search.placeholder = option.nativeSearch?.placeholder ?? "";
-        search.className = "vaultkit-native-search-input";
-        search.autocapitalize = "none";
-        search.autocomplete = "off";
-        search.spellcheck = false;
-        search.addEventListener("click", (event) => event.stopPropagation());
-        search.addEventListener("touchstart", (event) => event.stopPropagation(), {
-          passive: true,
-        });
-        search.addEventListener("keydown", (event) => event.stopPropagation());
-        search.addEventListener("input", () => {
-          if (nativeSearchTimeout != null) win.clearTimeout(nativeSearchTimeout);
-          nativeSearchTimeout = win.setTimeout(() => {
-            const nextValue = search.value;
-            hide(true);
-            option.nativeSearch?.onChange(nextValue);
-          }, 180);
-        });
-        wrapper.appendChild(search);
-        item.setTitle(wrapper);
-        if (option.nativeSearch?.autoFocus) {
-          win.setTimeout(() => {
-            search.focus();
-            search.setSelectionRange(search.value.length, search.value.length);
-          }, 0);
-        }
-      });
       return;
     }
 
