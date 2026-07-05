@@ -243,10 +243,25 @@ const checks = [
       stickerPickerMenu.includes("i18n.labels.back") &&
       stickerPickerMenu.includes("lucide//chevron-left") &&
       stickerPickerMenu.includes("i18n.labels.findStickers") &&
-      stickerPickerMenu.includes("openStickerPalette(superstate, win, selectedSticker, category)") &&
-      stickerPickerMenu.includes("noIcon: category == \"emoji\"") &&
-      nativeObsidianMenu.includes("if (optionProps.noIcon) menu.setNoIcon()") &&
-      menuTypes.includes("noIcon?: boolean"),
+      stickerPickerMenu.includes("nativeSearch") &&
+      stickerPickerMenu.includes("showNativeStickerCategoryMenu(") &&
+      stickerPickerMenu.includes("category: string | null") &&
+      !stickerPickerMenu.includes("openStickerPalette(superstate, win, selectedSticker, category)") &&
+      !stickerPickerMenu.includes("noIcon: category") &&
+      !nativeObsidianMenu.includes("menu.setNoIcon()") &&
+      !menuTypes.includes("noIcon?: boolean"),
+  },
+  {
+    name: "native mobile sticker search renders inside Obsidian Menu",
+    pass:
+      menuTypes.includes("nativeSearch?:") &&
+      nativeObsidianMenu.includes("option.nativeSearch") &&
+      nativeObsidianMenu.includes("createElement(\"input\")") &&
+      nativeObsidianMenu.includes("vaultkit-native-search-input") &&
+      nativeObsidianMenu.includes("option.nativeSearch?.onChange(nextValue)") &&
+      menuCss.includes(".vaultkit-native-search-input") &&
+      stickerPickerMenu.includes("matchesStickerQuery") &&
+      stickerPickerMenu.includes("showNativeStickerCategoryMenu(\n          superstate,\n          offset,\n          win,\n          null"),
   },
   {
     name: "sticker palette incrementally loads large sticker sets",

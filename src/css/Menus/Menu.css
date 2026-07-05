@@ -333,6 +333,23 @@ max-height: var(--mk-menu-max-height)
     background: var(--mk-ui-background-contrast);
 }
 
+.vaultkit-native-search-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: thin solid var(--mk-ui-border);
+  border-radius: 999px;
+  background: var(--mk-ui-background-contrast);
+  color: var(--text-normal);
+  font: inherit;
+  padding: 8px 12px;
+  outline: none;
+}
+
+.vaultkit-native-search-input:focus {
+  border-color: var(--interactive-accent);
+}
+
 .is-phone .mk-menu-option {
   padding: 12px;
   background: none !important;

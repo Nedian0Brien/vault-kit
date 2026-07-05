@@ -20,6 +20,14 @@ const stickerMenuName = (sticker: Sticker) =>
     ? `${emojiFromString(sticker.value)} ${sticker.name}`
     : sticker.name;
 
+const matchesStickerQuery = (sticker: Sticker, query: string) => {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return true;
+  return [sticker.name, sticker.value, sticker.keywords].some((value) =>
+    value.toLowerCase().includes(normalizedQuery)
+  );
+};
+
 const logStickerPicker = (message: string, data?: Record<string, unknown>) => {
   console.log("[VaultKit][sticker-picker]", message, data ?? {});
 };
@@ -52,17 +60,22 @@ const showNativeStickerCategoryMenu = (
   superstate: Superstate,
   rect: Rect,
   win: Window,
-  category: string,
+  category: string | null,
   selectedSticker: (sticker: string) => void,
-  visibleCount = NATIVE_STICKER_BATCH_SIZE
+  visibleCount = NATIVE_STICKER_BATCH_SIZE,
+  query = "",
+  focusSearch = false
 ): MenuObject => {
   const allStickers = superstate.ui.allStickers();
   const categoryStickers = allStickers.filter(
-    (sticker) => sticker.type == category
+    (sticker) =>
+      (category == null || sticker.type == category) &&
+      matchesStickerQuery(sticker, query)
   );
   const visibleStickers = categoryStickers.slice(0, visibleCount);
   logStickerPicker("category:build-options:start", {
-    category,
+    category: category ?? "all",
+    query,
     allCount: allStickers.length,
     categoryCount: categoryStickers.length,
     visibleCount: visibleStickers.length,
@@ -79,9 +92,22 @@ const showNativeStickerCategoryMenu = (
     },
     {
       name: i18n.labels.findStickers,
-      icon: "ui//search",
-      onClick: () =>
-        openStickerPalette(superstate, win, selectedSticker, category),
+      nativeSearch: {
+        value: query,
+        placeholder: i18n.labels.findStickers,
+        autoFocus: focusSearch,
+        onChange: (value) =>
+          showNativeStickerCategoryMenu(
+            superstate,
+            rect,
+            win,
+            category,
+            selectedSticker,
+            NATIVE_STICKER_BATCH_SIZE,
+            value,
+            true
+          ),
+      },
     },
     menuSeparator,
   ];
@@ -109,13 +135,16 @@ const showNativeStickerCategoryMenu = (
           win,
           category,
           selectedSticker,
-          visibleCount + NATIVE_STICKER_BATCH_SIZE
+          visibleCount + NATIVE_STICKER_BATCH_SIZE,
+          query,
+          focusSearch
         ),
     });
   }
 
   logStickerPicker("category:open-menu:before", {
-    category,
+    category: category ?? "all",
+    query,
     optionCount: options.length,
     visibleCount: visibleStickers.length,
     totalCount: categoryStickers.length,
@@ -126,21 +155,18 @@ const showNativeStickerCategoryMenu = (
   try {
     const menu = superstate.ui.openMenu(
       rect,
-      {
-        ...defaultMenu(superstate.ui, options),
-        noIcon: category == "emoji",
-      },
+      defaultMenu(superstate.ui, options),
       win,
       "bottom"
     );
     logStickerPicker("category:open-menu:after", {
-      category,
+      category: category ?? "all",
       optionCount: options.length,
     });
     return menu;
   } catch (error) {
     console.error("[VaultKit][sticker-picker] category:open-menu:error", {
-      category,
+      category: category ?? "all",
       optionCount: options.length,
       error,
     });
@@ -177,7 +203,15 @@ export const showStickerPickerMenu = (
     {
       name: i18n.labels.findStickers,
       icon: "ui//search",
-      onClick: () => openStickerPalette(superstate, win, selectedSticker),
+      type: SelectOptionType.Submenu,
+      onSubmenu: (offset) =>
+        showNativeStickerCategoryMenu(
+          superstate,
+          offset,
+          win,
+          null,
+          selectedSticker
+        ),
     },
   ];
 
