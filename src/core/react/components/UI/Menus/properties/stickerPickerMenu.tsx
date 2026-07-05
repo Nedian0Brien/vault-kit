@@ -6,6 +6,7 @@ import i18n from "shared/i18n";
 import { MenuObject } from "shared/types/menu";
 import { Rect } from "shared/types/Pos";
 import { Sticker } from "shared/types/ui";
+import { emojiFromString } from "shared/utils/stickers";
 import { defaultMenu, menuSeparator } from "../menu/SelectionMenu";
 
 const NATIVE_STICKER_BATCH_SIZE = 100;
@@ -13,6 +14,11 @@ const stickerValue = (sticker: Sticker) => `${sticker.type}//${sticker.value}`;
 
 const nativeStickerIcon = (sticker: Sticker) =>
   sticker.type == "lucide" ? `lucide//${sticker.value}` : undefined;
+
+const stickerMenuName = (sticker: Sticker) =>
+  sticker.type == "emoji"
+    ? `${emojiFromString(sticker.value)} ${sticker.name}`
+    : sticker.name;
 
 const logStickerPicker = (message: string, data?: Record<string, unknown>) => {
   console.log("[VaultKit][sticker-picker]", message, data ?? {});
@@ -66,7 +72,7 @@ const showNativeStickerCategoryMenu = (
 
   const options = visibleStickers.map(
     (sticker): SelectOption => ({
-      name: sticker.name,
+      name: stickerMenuName(sticker),
       icon: nativeStickerIcon(sticker),
       onClick: () => selectedSticker(stickerValue(sticker)),
     })

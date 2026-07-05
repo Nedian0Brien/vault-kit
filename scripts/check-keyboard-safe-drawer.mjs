@@ -214,9 +214,11 @@ const checks = [
   {
     name: "native mobile sticker picker keeps emoji out of native icon path",
     pass:
-      stickerPickerMenu.includes("name: sticker.name") &&
+      stickerPickerMenu.includes("stickerMenuName") &&
+      stickerPickerMenu.includes("emojiFromString(sticker.value)") &&
       stickerPickerMenu.includes("nativeStickerIcon(sticker)") &&
-      !stickerPickerMenu.includes("emojiFromString"),
+      stickerPickerMenu.includes('sticker.type == "lucide"') &&
+      !stickerPickerMenu.includes("addIcon("),
   },
   {
     name: "mobile sticker native drawer pages large sticker categories",
