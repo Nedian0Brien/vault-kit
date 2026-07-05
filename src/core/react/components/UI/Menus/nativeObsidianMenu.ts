@@ -23,7 +23,7 @@ const toMenuPosition = (rect: Rect, anchor: Anchors) => ({
 });
 
 const logNativeMenu = (message: string, data?: Record<string, unknown>) => {
-  console.info("[VaultKit][native-menu]", message, data ?? {});
+  console.log("[VaultKit][native-menu]", message, data ?? {});
 };
 
 const optionSample = (option: SelectOption) => ({

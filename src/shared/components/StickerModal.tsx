@@ -14,6 +14,7 @@ interface StickerModalProps {
   ui: UIManager;
   selectedSticker: (path: string) => void;
   hide?: () => void;
+  initialCategory?: string;
 }
 
 const StickerModal: React.FC<StickerModalProps> = (props) => {
@@ -64,7 +65,9 @@ const StickerModal: React.FC<StickerModalProps> = (props) => {
       }
     };
   }, [loadNextPage]);
-  const [selectedCategory, setSelectedCategory] = useState<string>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    props.initialCategory ?? null
+  );
   useEffect(() => {
     setStickers(
       allStickers

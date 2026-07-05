@@ -33,6 +33,10 @@ const stickerPickerMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/properties/stickerPickerMenu.tsx",
   "utf8"
 );
+const stickerModal = fs.readFileSync(
+  "src/shared/components/StickerModal.tsx",
+  "utf8"
+);
 
 const checks = [
   {
@@ -212,6 +216,17 @@ const checks = [
       stickerPickerMenu.includes("name: sticker.name") &&
       stickerPickerMenu.includes("nativeStickerIcon(sticker)") &&
       !stickerPickerMenu.includes("emojiFromString"),
+  },
+  {
+    name: "mobile emoji sticker category bypasses native drawer",
+    pass:
+      stickerPickerMenu.includes('if (category == "emoji")') &&
+      stickerPickerMenu.includes('"category:emoji-open-palette"') &&
+      stickerPickerMenu.includes(
+        "openStickerPalette(superstate, win, selectedSticker, category)"
+      ) &&
+      stickerModal.includes("initialCategory?: string") &&
+      stickerModal.includes("props.initialCategory ?? null"),
   },
 ];
 

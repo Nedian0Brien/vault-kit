@@ -14,7 +14,7 @@ const nativeStickerIcon = (sticker: Sticker) =>
   sticker.type == "lucide" ? `lucide//${sticker.value}` : undefined;
 
 const logStickerPicker = (message: string, data?: Record<string, unknown>) => {
-  console.info("[VaultKit][sticker-picker]", message, data ?? {});
+  console.log("[VaultKit][sticker-picker]", message, data ?? {});
 };
 
 const stickerSample = (sticker: Sticker) => ({
@@ -29,10 +29,15 @@ const stickerSample = (sticker: Sticker) => ({
 const openStickerPalette = (
   superstate: Superstate,
   win: Window,
-  selectedSticker: (sticker: string) => void
+  selectedSticker: (sticker: string) => void,
+  initialCategory?: string
 ) =>
   superstate.ui.openPalette(
-    <StickerModal ui={superstate.ui} selectedSticker={selectedSticker} />,
+    <StickerModal
+      ui={superstate.ui}
+      selectedSticker={selectedSticker}
+      initialCategory={initialCategory}
+    />,
     win
   );
 
@@ -43,6 +48,11 @@ const showNativeStickerCategoryMenu = (
   category: string,
   selectedSticker: (sticker: string) => void
 ): MenuObject => {
+  if (category == "emoji") {
+    logStickerPicker("category:emoji-open-palette", { category });
+    return openStickerPalette(superstate, win, selectedSticker, category);
+  }
+
   const allStickers = superstate.ui.allStickers();
   const categoryStickers = allStickers.filter(
     (sticker) => sticker.type == category
