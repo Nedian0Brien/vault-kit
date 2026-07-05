@@ -1,14 +1,50 @@
 import { isPhone } from "core/utils/ui/screen";
 import { SelectOption, SelectOptionType, Superstate } from "makemd-core";
+import { addIcon } from "obsidian";
 import React from "react";
 import StickerModal from "shared/components/StickerModal";
 import i18n from "shared/i18n";
 import { MenuObject } from "shared/types/menu";
 import { Rect } from "shared/types/Pos";
 import { Sticker } from "shared/types/ui";
+import { emojiFromString } from "shared/utils/stickers";
 import { defaultMenu, menuSeparator } from "../menu/SelectionMenu";
 
 const stickerValue = (sticker: Sticker) => `${sticker.type}//${sticker.value}`;
+const stickerPreviewIconIds = new Set<string>();
+
+const hashStickerValue = (value: string) => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+};
+
+const escapeSvgText = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+const stickerTextSvg = (text: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="12" y="16" text-anchor="middle" font-size="14">${escapeSvgText(
+    text
+  )}</text></svg>`;
+
+const registerStickerPreviewIcon = (sticker: Sticker) => {
+  const iconId = `vaultkit-sticker-preview-${hashStickerValue(
+    stickerValue(sticker)
+  )}`;
+  if (stickerPreviewIconIds.has(iconId)) return iconId;
+
+  const html = sticker.type == "emoji" ? emojiFromString(sticker.html) : sticker.html;
+  const svg = html.trim().startsWith("<svg") ? html : stickerTextSvg(html);
+  addIcon(iconId, svg);
+  stickerPreviewIconIds.add(iconId);
+  return iconId;
+};
 
 const openStickerPalette = (
   superstate: Superstate,
@@ -33,7 +69,7 @@ const showNativeStickerCategoryMenu = (
     .map(
       (sticker): SelectOption => ({
         name: sticker.name,
-        icon: "ui//sticker",
+        icon: registerStickerPreviewIcon(sticker),
         onClick: () => selectedSticker(stickerValue(sticker)),
       })
     );

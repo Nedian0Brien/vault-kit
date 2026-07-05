@@ -1,6 +1,7 @@
 import { Rect } from "shared/types/Pos";
 
 import { SelectOption, Superstate } from "makemd-core";
+import { addIcon } from "obsidian";
 
 import {
   Gradient,
@@ -21,6 +22,42 @@ import {
 } from "core/utils/colorPalette";
 import { isPhone } from "core/utils/ui/screen";
 import { defaultMenu, menuSection, menuSeparator } from "../menu/SelectionMenu";
+
+const colorSwatchIconIds = new Set<string>();
+
+const hashColorValue = (value: string) => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+};
+
+const escapeSvgAttribute = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+const registerColorSwatchIcon = (color: string) => {
+  const value = color || "transparent";
+  const iconId = `vaultkit-color-swatch-${hashColorValue(value)}`;
+  if (colorSwatchIconIds.has(iconId)) return iconId;
+
+  const fill = value.includes("gradient(")
+    ? "currentColor"
+    : escapeSvgAttribute(value);
+  const svg =
+    value == "transparent"
+      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.75"/><line x1="7" y1="17" x2="17" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5" fill="${fill}" stroke="currentColor" stroke-width="1.5" opacity="0.95"/></svg>`;
+
+  addIcon(iconId, svg);
+  colorSwatchIconIds.add(iconId);
+  return iconId;
+};
 
 // Color mode types
 type ColorMode = 'palettes' | 'solid' | 'gradient' | 'none';
@@ -1070,7 +1107,7 @@ const showNativeColorPickerMenu = (
   const options: SelectOption[] = [
     {
       name: i18n.menu.noColor,
-      icon: value ? "ui//close" : "ui//check",
+      icon: registerColorSwatchIcon("transparent"),
       onClick: () => setValue(""),
     },
   ];
@@ -1081,7 +1118,7 @@ const showNativeColorPickerMenu = (
     palette.colors.forEach((color) => {
       options.push({
         name: color.name,
-        icon: color.value == value ? "ui//check" : "ui//palette",
+        icon: registerColorSwatchIcon(color.value),
         onClick: () => setValue(color.value),
       });
     });

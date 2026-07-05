@@ -178,6 +178,14 @@ const checks = [
       colorPickerMenu.includes("defaultMenu(superstate.ui, options)"),
   },
   {
+    name: "native mobile color picker uses circular swatch icons",
+    pass:
+      colorPickerMenu.includes("registerColorSwatchIcon") &&
+      colorPickerMenu.includes("addIcon(iconId, svg)") &&
+      colorPickerMenu.includes("vaultkit-color-swatch") &&
+      colorPickerMenu.includes('icon: registerColorSwatchIcon(color.value)'),
+  },
+  {
     name: "mobile sticker picker offers native Obsidian menu categories",
     pass:
       stickerPickerMenu.includes("showStickerPickerMenu") &&
@@ -185,6 +193,14 @@ const checks = [
       stickerPickerMenu.includes("SelectOptionType.Submenu") &&
       stickerPickerMenu.includes("showNativeStickerCategoryMenu") &&
       stickerPickerMenu.includes("openStickerPalette"),
+  },
+  {
+    name: "native mobile sticker picker uses sticker preview icons",
+    pass:
+      stickerPickerMenu.includes("registerStickerPreviewIcon") &&
+      stickerPickerMenu.includes("addIcon(iconId, svg)") &&
+      stickerPickerMenu.includes("vaultkit-sticker-preview") &&
+      stickerPickerMenu.includes("icon: registerStickerPreviewIcon(sticker)"),
   },
 ];
 
