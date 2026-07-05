@@ -19,7 +19,6 @@ import {
   savePathIcon,
 } from "core/utils/emoji";
 import React from "react";
-import StickerModal from "shared/components/StickerModal";
 import { default as i18n } from "shared/i18n";
 import { removeIconsForPaths } from "shared/utils/sticker";
 
@@ -33,6 +32,7 @@ import { ConfirmationModal } from "../../Modals/ConfirmationModal";
 import { defaultMenu, menuSeparator } from "../menu/SelectionMenu";
 import { showColorPickerMenu } from "../properties/colorPickerMenu";
 import { showSpacesMenu } from "../properties/selectSpaceMenu";
+import { showStickerPickerMenu } from "../properties/stickerPickerMenu";
 import { showSpaceContextMenu } from "./spaceContextMenu";
 
 export const triggerMultiPathMenu = (
@@ -75,17 +75,26 @@ export const triggerMultiPathMenu = (
     menuOptions.push({
       name: i18n.buttons.changeIcon,
       icon: "ui//sticker",
-      onClick: (e) => {
-        superstate.ui.openPalette(
-          <StickerModal
-            ui={superstate.ui}
-            selectedSticker={(emoji) =>
-              saveIconsForPaths(superstate, paths, emoji)
-            }
-          />,
-          windowFromDocument(e.view.document)
-        );
-      },
+      ...(isTouchScreen(superstate.ui)
+        ? {
+            type: SelectOptionType.Submenu,
+            onSubmenu: (offset: Rect) =>
+              showStickerPickerMenu(
+                superstate,
+                offset,
+                windowFromDocument(e.view.document),
+                (emoji) => saveIconsForPaths(superstate, paths, emoji)
+              ),
+          }
+        : {
+            onClick: (event: React.MouseEvent) =>
+              showStickerPickerMenu(
+                superstate,
+                (event.target as HTMLElement).getBoundingClientRect(),
+                windowFromDocument(event.view.document),
+                (emoji) => saveIconsForPaths(superstate, paths, emoji)
+              ),
+          }),
     });
     menuOptions.push({
       name: i18n.buttons.removeIcon,
@@ -234,15 +243,23 @@ export const showPathContextMenu = (
     menuOptions.push({
       name: i18n.buttons.changeIcon,
       icon: "ui//sticker",
-      onClick: (e) => {
-        superstate.ui.openPalette(
-          <StickerModal
-            ui={superstate.ui}
-            selectedSticker={(emoji) => savePathIcon(superstate, path, emoji)}
-          />,
-          windowFromDocument(e.view.document)
-        );
-      },
+      ...(isTouchScreen(superstate.ui)
+        ? {
+            type: SelectOptionType.Submenu,
+            onSubmenu: (offset: Rect) =>
+              showStickerPickerMenu(superstate, offset, win, (emoji) =>
+                savePathIcon(superstate, path, emoji)
+              ),
+          }
+        : {
+            onClick: (event: React.MouseEvent) =>
+              showStickerPickerMenu(
+                superstate,
+                (event.target as HTMLElement).getBoundingClientRect(),
+                windowFromDocument(event.view.document),
+                (emoji) => savePathIcon(superstate, path, emoji)
+              ),
+          }),
     });
     menuOptions.push({
       name: i18n.buttons.removeIcon,

@@ -11,7 +11,6 @@ import { removePathIcon } from "core/utils/emoji";
 import { isTouchScreen } from "core/utils/ui/screen";
 import { SelectOption, SelectOptionType, Superstate } from "makemd-core";
 import React from "react";
-import StickerModal from "shared/components/StickerModal";
 import { default as i18n } from "shared/i18n";
 import { PathState } from "shared/types/PathState";
 import { SpaceSort } from "shared/types/spaceDef";
@@ -24,6 +23,7 @@ import { InputModal } from "../../Modals/InputModal";
 import { defaultMenu, menuSeparator } from "../menu/SelectionMenu";
 import { showColorPickerMenu } from "../properties/colorPickerMenu";
 import { showSpacesMenu } from "../properties/selectSpaceMenu";
+import { showStickerPickerMenu } from "../properties/stickerPickerMenu";
 import { showApplyItemsMenu } from "./showApplyItemsMenu";
 import { showSpaceAddMenu } from "./showSpaceAddMenu";
 import { Rect } from "shared/types/Pos";
@@ -87,17 +87,23 @@ export const showSpaceContextMenu = (
     menuOptions.push({
       name: i18n.buttons.changeIcon,
       icon: "ui//sticker",
-      onClick: (e) => {
-        superstate.ui.openPalette(
-          <StickerModal
-            ui={superstate.ui}
-            selectedSticker={(emoji) =>
-              savePathSticker(superstate, space.path, emoji)
-            }
-          />,
-          win
-        );
-      },
+      ...(isTouchScreen(superstate.ui)
+        ? {
+            type: SelectOptionType.Submenu,
+            onSubmenu: (offset: Rect) =>
+              showStickerPickerMenu(superstate, offset, win, (emoji) =>
+                savePathSticker(superstate, space.path, emoji)
+              ),
+          }
+        : {
+            onClick: (event: React.MouseEvent) =>
+              showStickerPickerMenu(
+                superstate,
+                (event.target as HTMLElement).getBoundingClientRect(),
+                win,
+                (emoji) => savePathSticker(superstate, space.path, emoji)
+              ),
+          }),
     });
     menuOptions.push({
       name: i18n.buttons.removeIcon,

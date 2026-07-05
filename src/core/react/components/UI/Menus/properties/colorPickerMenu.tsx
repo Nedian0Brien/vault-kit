@@ -1,6 +1,6 @@
 import { Rect } from "shared/types/Pos";
 
-import { Superstate } from "makemd-core";
+import { SelectOption, Superstate } from "makemd-core";
 
 import {
   Gradient,
@@ -19,6 +19,8 @@ import {
   getAllGradients,
   createGradientCssValue,
 } from "core/utils/colorPalette";
+import { isPhone } from "core/utils/ui/screen";
+import { defaultMenu, menuSection, menuSeparator } from "../menu/SelectionMenu";
 
 // Color mode types
 type ColorMode = 'palettes' | 'solid' | 'gradient' | 'none';
@@ -1057,6 +1059,42 @@ export const ColorPicker = (props: {
   );
 };
 
+const showNativeColorPickerMenu = (
+  superstate: Superstate,
+  rect: Rect,
+  win: Window,
+  value: string,
+  setValue: (color: string) => void
+) => {
+  const palettes = getColorPalettes(superstate);
+  const options: SelectOption[] = [
+    {
+      name: i18n.menu.noColor,
+      icon: value ? "ui//close" : "ui//check",
+      onClick: () => setValue(""),
+    },
+  ];
+
+  palettes.forEach((palette) => {
+    options.push(menuSeparator);
+    options.push(menuSection(palette.name));
+    palette.colors.forEach((color) => {
+      options.push({
+        name: color.name,
+        icon: color.value == value ? "ui//check" : "ui//palette",
+        onClick: () => setValue(color.value),
+      });
+    });
+  });
+
+  return superstate.ui.openMenu(
+    rect,
+    defaultMenu(superstate.ui, options),
+    win,
+    "bottom"
+  );
+};
+
 export const showColorPickerMenu = (
   superstate: Superstate,
   rect: Rect,
@@ -1067,6 +1105,10 @@ export const showColorPickerMenu = (
   isSubmenu?: boolean,
   hidePaletteSelector?: boolean
 ) => {
+  if (isPhone(superstate.ui) && isSubmenu && !stayOpen && !hidePaletteSelector) {
+    return showNativeColorPickerMenu(superstate, rect, win, value, setValue);
+  }
+
   return superstate.ui.openCustomMenu(
     rect,
     <ColorPicker

@@ -1,13 +1,14 @@
 import { saveSpaceCache } from "core/superstate/utils/spaces";
 import { tagSpacePathFromTag } from "core/utils/strings";
+import { isTouchScreen } from "core/utils/ui/screen";
 import { SelectOption, SelectOptionType, Superstate } from "makemd-core";
 import i18n from "shared/i18n";
 import React from "react";
 import { SpaceState } from "shared/types/PathState";
 import { Rect } from "shared/types/Pos";
 import { ensureTag } from "utils/tags";
-import StickerModal from "../../../../../../shared/components/StickerModal";
 import { defaultMenu, menuSeparator } from "../menu/SelectionMenu";
+import { showStickerPickerMenu } from "../properties/stickerPickerMenu";
 
 const saveContexts = (
   superstate: Superstate,
@@ -148,20 +149,30 @@ export const showApplyItemsMenu = (
       name: i18n.menu.setDefaultSticker,
       icon: "ui//sticker",
       value: "apply-all-sticker",
-      onClick: () => {
-        superstate.ui.openPalette(
-          <StickerModal
-            ui={superstate.ui}
-            selectedSticker={(emoji) =>
-              saveSpaceCache(superstate, space.space, {
-                ...space.metadata,
-                defaultSticker: emoji,
-              })
-            }
-          />,
-          win
-        );
-      },
+      ...(isTouchScreen(superstate.ui)
+        ? {
+            type: SelectOptionType.Submenu,
+            onSubmenu: (rect: Rect) =>
+              showStickerPickerMenu(superstate, rect, win, (emoji) =>
+                saveSpaceCache(superstate, space.space, {
+                  ...space.metadata,
+                  defaultSticker: emoji,
+                })
+              ),
+          }
+        : {
+            onClick: (event: React.MouseEvent) =>
+              showStickerPickerMenu(
+                superstate,
+                (event.target as HTMLElement).getBoundingClientRect(),
+                win,
+                (emoji) =>
+                  saveSpaceCache(superstate, space.space, {
+                    ...space.metadata,
+                    defaultSticker: emoji,
+                  })
+              ),
+          }),
     },
   ];
   return superstate.ui.openMenu(

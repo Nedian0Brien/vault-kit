@@ -25,6 +25,14 @@ const nativeObsidianMenu = fs.readFileSync(
   "src/core/react/components/UI/Menus/nativeObsidianMenu.ts",
   "utf8"
 );
+const colorPickerMenu = fs.readFileSync(
+  "src/core/react/components/UI/Menus/properties/colorPickerMenu.tsx",
+  "utf8"
+);
+const stickerPickerMenu = fs.readFileSync(
+  "src/core/react/components/UI/Menus/properties/stickerPickerMenu.tsx",
+  "utf8"
+);
 
 const checks = [
   {
@@ -150,6 +158,33 @@ const checks = [
       nativeObsidianMenu.includes("SelectOptionType.Custom") &&
       nativeObsidianMenu.includes("option.onMoreOptions") &&
       nativeObsidianMenu.includes("option.onRemove"),
+  },
+  {
+    name: "native mobile menu maps Make icons to Obsidian icons",
+    pass:
+      nativeObsidianMenu.includes("uiIconMap") &&
+      nativeObsidianMenu.includes("toObsidianIcon") &&
+      nativeObsidianMenu.includes("item.setIcon(icon)") &&
+      nativeObsidianMenu.includes('"go-to-file": "file-input"') &&
+      nativeObsidianMenu.includes("check: \"check\"") &&
+      nativeObsidianMenu.includes("sticker: \"sticker\""),
+  },
+  {
+    name: "mobile color picker submenus prefer native Obsidian menu",
+    pass:
+      colorPickerMenu.includes("showNativeColorPickerMenu") &&
+      colorPickerMenu.includes("getColorPalettes(superstate)") &&
+      colorPickerMenu.includes("isPhone(superstate.ui) && isSubmenu") &&
+      colorPickerMenu.includes("defaultMenu(superstate.ui, options)"),
+  },
+  {
+    name: "mobile sticker picker offers native Obsidian menu categories",
+    pass:
+      stickerPickerMenu.includes("showStickerPickerMenu") &&
+      stickerPickerMenu.includes("isPhone(superstate.ui)") &&
+      stickerPickerMenu.includes("SelectOptionType.Submenu") &&
+      stickerPickerMenu.includes("showNativeStickerCategoryMenu") &&
+      stickerPickerMenu.includes("openStickerPalette"),
   },
 ];
 

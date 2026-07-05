@@ -22,6 +22,44 @@ const toMenuPosition = (rect: Rect, anchor: Anchors) => ({
   width: rect.width,
 });
 
+const uiIconMap: Record<string, string> = {
+  "apply-items": "list-checks",
+  "arrow-up-down": "arrow-up-down",
+  "arrow-up-right": "arrow-up-right",
+  check: "check",
+  "clipboard-add": "clipboard-plus",
+  close: "x",
+  copy: "copy",
+  documents: "files",
+  edit: "pencil",
+  "eye-off": "eye-off",
+  "file-minus": "file-minus",
+  "file-plus-2": "file-plus-2",
+  "folder-plus": "folder-plus",
+  "go-to-file": "file-input",
+  "layout-dashboard": "layout-dashboard",
+  "paper-plane": "send",
+  palette: "palette",
+  pin: "pin",
+  "pin-off": "pin-off",
+  plus: "plus",
+  search: "search",
+  "sort-desc": "arrow-down-wide-narrow",
+  sticker: "sticker",
+  tags: "tags",
+  trash: "trash",
+};
+
+const toObsidianIcon = (icon?: string) => {
+  if (!icon) return null;
+  if (!icon.includes("//")) return icon;
+
+  const [source, value] = icon.split("//");
+  if (source == "lucide") return value;
+  if (source == "ui") return uiIconMap[value] ?? null;
+  return null;
+};
+
 const toReactMouseEvent = (
   event: MouseEvent | KeyboardEvent,
   win: Window
@@ -127,6 +165,8 @@ export const showNativeObsidianMenu = (
 
     menu.addItem((item) => {
       item.setTitle(option.name);
+      const icon = toObsidianIcon(option.icon);
+      if (icon) item.setIcon(icon);
       if (option.type == SelectOptionType.Section) {
         item.setIsLabel(true);
         item.setDisabled(true);
