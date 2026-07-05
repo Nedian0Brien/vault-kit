@@ -61,6 +61,25 @@ const getVisualViewportBounds = (win: Window) => {
   };
 };
 
+const getFloatingSearchAnchor = (menuEl: HTMLElement) => {
+  const candidates = [
+    menuEl.closest<HTMLElement>("[vaul-drawer]"),
+    menuEl.closest<HTMLElement>("[data-vaul-drawer]"),
+    menuEl.closest<HTMLElement>(".modal"),
+    menuEl,
+  ];
+  return (
+    candidates.find((el) => {
+      if (!el) return false;
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.width > FLOATING_SEARCH_MIN_SIDE_GAP * 2 &&
+        rect.height > FLOATING_SEARCH_HEIGHT
+      );
+    }) ?? menuEl
+  );
+};
+
 const attachFloatingSearch = (
   menu: Menu,
   optionProps: SelectMenuProps,
@@ -80,34 +99,36 @@ const attachFloatingSearch = (
   const stopMenuEvent = (event: Event) => event.stopPropagation();
   const syncPosition = () => {
     if (!menu.dom || !search.isConnected) return;
-    const menuRect = menu.dom.getBoundingClientRect();
+    const anchorEl = getFloatingSearchAnchor(menu.dom);
+    const anchorRect = anchorEl.getBoundingClientRect();
     const viewport = getVisualViewportBounds(win);
-    const viewportBottom = viewport.top + viewport.height;
     const maxWidth = Math.max(
       0,
       viewport.width - FLOATING_SEARCH_MIN_SIDE_GAP * 2
     );
-    const width = Math.min(menuRect.width, maxWidth);
+    const width = Math.min(
+      Math.max(0, anchorRect.width - FLOATING_SEARCH_MIN_SIDE_GAP * 2),
+      maxWidth
+    );
     const left = Math.min(
-      Math.max(menuRect.left, FLOATING_SEARCH_MIN_SIDE_GAP),
+      Math.max(
+        anchorRect.left + FLOATING_SEARCH_MIN_SIDE_GAP,
+        FLOATING_SEARCH_MIN_SIDE_GAP
+      ),
       viewport.width - width - FLOATING_SEARCH_MIN_SIDE_GAP
     );
-    const preferredTop =
-      menuRect.top - FLOATING_SEARCH_HEIGHT - FLOATING_SEARCH_MENU_GAP;
     const top =
-      preferredTop > viewport.top + FLOATING_SEARCH_TOP_GAP
-        ? preferredTop
-        : Math.min(
-            menuRect.top + FLOATING_SEARCH_TOP_GAP,
-            viewportBottom - FLOATING_SEARCH_HEIGHT - FLOATING_SEARCH_TOP_GAP
-          );
+      anchorRect.top - FLOATING_SEARCH_HEIGHT - FLOATING_SEARCH_MENU_GAP;
 
     search.style.left = `${left}px`;
     search.style.top = `${Math.max(viewport.top + FLOATING_SEARCH_TOP_GAP, top)}px`;
     search.style.width = `${width}px`;
   };
   const onInput = () => optionProps.floatingSearch?.onChange(search.value);
-  const menuZIndex = Number.parseInt(win.getComputedStyle(menu.dom).zIndex, 10);
+  const menuZIndex = Number.parseInt(
+    win.getComputedStyle(getFloatingSearchAnchor(menu.dom)).zIndex,
+    10
+  );
   if (Number.isFinite(menuZIndex)) {
     search.style.zIndex = `${menuZIndex + 2}`;
   }
@@ -123,6 +144,8 @@ const attachFloatingSearch = (
   syncPosition();
   logNativeMenu("show:floating-search:attached", {
     zIndex: search.style.zIndex || null,
+    anchor: getFloatingSearchAnchor(menu.dom).tagName,
+    anchorClass: getFloatingSearchAnchor(menu.dom).className,
     valueLength: optionProps.floatingSearch.value.length,
   });
   if (optionProps.floatingSearch.autoFocus) {

@@ -251,6 +251,10 @@ const checks = [
       !menuTypes.includes("nativeSearch?:") &&
       !nativeObsidianMenu.includes("option.nativeSearch") &&
       nativeObsidianMenu.includes("attachFloatingSearch") &&
+      nativeObsidianMenu.includes("getFloatingSearchAnchor") &&
+      nativeObsidianMenu.includes('closest<HTMLElement>("[vaul-drawer]")') &&
+      nativeObsidianMenu.includes('closest<HTMLElement>("[data-vaul-drawer]")') &&
+      nativeObsidianMenu.includes('closest<HTMLElement>(".modal")') &&
       nativeObsidianMenu.includes("document.body.appendChild(search)") &&
       nativeObsidianMenu.includes("menuZIndex + 2") &&
       !nativeObsidianMenu.includes("setTitle(search)") &&
