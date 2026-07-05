@@ -156,7 +156,6 @@ export const showNativeObsidianMenu = (
   const menu = new Menu();
   let isComplete = false;
   let isParentHidden = false;
-  let isOpeningSubmenu = false;
   let submenu: { hide: (suppress?: boolean) => void } | null = null;
   let removeAutoLoadMoreScroll: (() => void) | null = null;
   let autoLoadMoreTriggered = false;
@@ -313,32 +312,10 @@ export const showNativeObsidianMenu = (
             option: optionSample(option),
             parentOptionCount: optionProps.options.length,
           });
-          const openSubmenu = option.onSubmenu;
-          isOpeningSubmenu = true;
+          const nextMenu = option.onSubmenu(rect, () => hide(false));
+          submenu?.hide(true);
+          submenu = nextMenu;
           hideParent();
-          win.setTimeout(() => {
-            if (isComplete) {
-              isOpeningSubmenu = false;
-              return;
-            }
-            logNativeMenu("item:submenu-open:deferred", {
-              option: optionSample(option),
-              parentOptionCount: optionProps.options.length,
-            });
-            try {
-              const nextMenu = openSubmenu(rect, () => hide(false));
-              submenu?.hide(true);
-              submenu = nextMenu;
-            } catch (error) {
-              console.error("[VaultKit][native-menu] item:submenu-open:error", {
-                option: optionSample(option),
-                error,
-              });
-              hide(false);
-            } finally {
-              isOpeningSubmenu = false;
-            }
-          }, 0);
           return;
         }
         if (option.onClick) {
@@ -355,7 +332,7 @@ export const showNativeObsidianMenu = (
 
   menu.onHide(() => {
     isParentHidden = true;
-    if (submenu || isComplete || isOpeningSubmenu) return;
+    if (submenu || isComplete) return;
     hide(false);
   });
   const position = toMenuPosition(rect, defaultAnchor);

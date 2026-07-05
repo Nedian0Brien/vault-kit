@@ -175,19 +175,15 @@ const checks = [
       nativeObsidianMenu.includes("sticker: \"sticker\""),
   },
   {
-    name: "native mobile submenu opens after parent action sheet closes",
+    name: "native mobile submenu uses the v1.3.24 synchronous handoff",
     pass:
-      nativeObsidianMenu.includes("isOpeningSubmenu") &&
-      nativeObsidianMenu.includes("item:submenu-open:deferred") &&
-      /isOpeningSubmenu = true;[\s\S]*hideParent\(\);[\s\S]*win\.setTimeout/.test(
+      /const nextMenu = option\.onSubmenu\(rect, \(\) => hide\(false\)\);[\s\S]*submenu\?\.hide\(true\);[\s\S]*submenu = nextMenu;[\s\S]*hideParent\(\);/.test(
         nativeObsidianMenu
       ) &&
-      /const nextMenu = openSubmenu[\s\S]*submenu = nextMenu;[\s\S]*finally \{[\s\S]*isOpeningSubmenu = false;/.test(
-        nativeObsidianMenu
-      ) &&
-      nativeObsidianMenu.includes(
-        "if (submenu || isComplete || isOpeningSubmenu) return;"
-      ),
+      nativeObsidianMenu.includes("if (submenu || isComplete) return;") &&
+      !nativeObsidianMenu.includes("isOpeningSubmenu") &&
+      !nativeObsidianMenu.includes("item:submenu-open:deferred") &&
+      !nativeObsidianMenu.includes("menu.setNoIcon()"),
   },
   {
     name: "mobile color picker submenus prefer native Obsidian menu",
