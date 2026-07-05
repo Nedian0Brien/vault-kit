@@ -39,7 +39,7 @@ const isSameMobileDrawerViewportStyle = (
 ) =>
   mobileDrawerViewportStyleKeys.every((key) => current[key] === next[key]);
 
-type MobileDrawerPhase = "measuring" | "open";
+type MobileDrawerPhase = "measuring" | "closed" | "open";
 
 export const MobileDrawer = (props: {
   fc: JSX.Element;
@@ -114,12 +114,18 @@ export const MobileDrawer = (props: {
       currentHeight === measuredHeight ? currentHeight : measuredHeight
     );
 
+    setDrawerPhase("closed");
+  }, [viewportStyle]);
+
+  React.useEffect(() => {
+    if (drawerPhase !== "closed") return;
+
     const animationFrame = requestAnimationFrame(() => {
       setDrawerPhase("open");
     });
 
     return () => cancelAnimationFrame(animationFrame);
-  }, [viewportStyle]);
+  }, [drawerPhase]);
 
   const hideDrawer = (supress?: boolean) => {
     props.hide(supress);

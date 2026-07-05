@@ -109,10 +109,18 @@ const checks = [
   {
     name: "MobileDrawer measures content before opening animation",
     pass:
-      drawer.includes('MobileDrawerPhase = "measuring" | "open"') &&
+      drawer.includes('MobileDrawerPhase = "measuring" | "closed" | "open"') &&
       drawer.includes("contentRef") &&
       drawer.includes("getBoundingClientRect().height") &&
       drawer.includes("requestAnimationFrame"),
+  },
+  {
+    name: "MobileDrawer paints closed frame before opening animation",
+    pass:
+      drawer.includes('setDrawerPhase("closed")') &&
+      /if \(drawerPhase !== "closed"\) return[\s\S]*requestAnimationFrame/.test(
+        drawer
+      ),
   },
   {
     name: "MobileDrawer locks measured content height during enter animation",
