@@ -183,7 +183,9 @@ const checks = [
       colorPickerMenu.includes("registerColorSwatchIcon") &&
       colorPickerMenu.includes("addIcon(iconId, svg)") &&
       colorPickerMenu.includes("vaultkit-color-swatch") &&
-      colorPickerMenu.includes('icon: registerColorSwatchIcon(color.value)'),
+      colorPickerMenu.includes('icon: registerColorSwatchIcon(color.value)') &&
+      colorPickerMenu.includes('r="8" fill="${fill}"') &&
+      !colorPickerMenu.includes('fill="${fill}" stroke='),
   },
   {
     name: "mobile sticker picker offers native Obsidian menu categories",
@@ -200,7 +202,9 @@ const checks = [
       stickerPickerMenu.includes("registerStickerPreviewIcon") &&
       stickerPickerMenu.includes("addIcon(iconId, svg)") &&
       stickerPickerMenu.includes("vaultkit-sticker-preview") &&
-      stickerPickerMenu.includes("icon: registerStickerPreviewIcon(sticker)"),
+      stickerPickerMenu.includes("icon: registerStickerPreviewIcon(sticker)") &&
+      stickerPickerMenu.includes('font-size="20"') &&
+      stickerPickerMenu.includes("normalizeStickerSvg"),
   },
 ];
 

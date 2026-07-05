@@ -29,9 +29,14 @@ const escapeSvgText = (value: string) =>
     .replace(/>/g, "&gt;");
 
 const stickerTextSvg = (text: string) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="12" y="16" text-anchor="middle" font-size="14">${escapeSvgText(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" font-size="20">${escapeSvgText(
     text
   )}</text></svg>`;
+
+const normalizeStickerSvg = (svg: string) =>
+  svg
+    .replace(/\s(width|height)="[^"]*"/g, "")
+    .replace("<svg", '<svg width="24" height="24"');
 
 const registerStickerPreviewIcon = (sticker: Sticker) => {
   const iconId = `vaultkit-sticker-preview-${hashStickerValue(
@@ -40,7 +45,9 @@ const registerStickerPreviewIcon = (sticker: Sticker) => {
   if (stickerPreviewIconIds.has(iconId)) return iconId;
 
   const html = sticker.type == "emoji" ? emojiFromString(sticker.html) : sticker.html;
-  const svg = html.trim().startsWith("<svg") ? html : stickerTextSvg(html);
+  const svg = html.trim().startsWith("<svg")
+    ? normalizeStickerSvg(html)
+    : stickerTextSvg(html);
   addIcon(iconId, svg);
   stickerPreviewIconIds.add(iconId);
   return iconId;

@@ -51,8 +51,8 @@ const registerColorSwatchIcon = (color: string) => {
     : escapeSvgAttribute(value);
   const svg =
     value == "transparent"
-      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.75"/><line x1="7" y1="17" x2="17" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5" fill="${fill}" stroke="currentColor" stroke-width="1.5" opacity="0.95"/></svg>`;
+      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="${fill}" opacity="0.95"/></svg>`;
 
   addIcon(iconId, svg);
   colorSwatchIconIds.add(iconId);
