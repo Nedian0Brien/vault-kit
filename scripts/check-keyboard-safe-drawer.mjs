@@ -197,21 +197,21 @@ const checks = [
       stickerPickerMenu.includes("openStickerPalette"),
   },
   {
-    name: "native mobile sticker picker uses sticker preview icons",
+    name: "native mobile sticker picker uses Obsidian-native lucide icons",
     pass:
-      stickerPickerMenu.includes("registerStickerPreviewIcon") &&
-      stickerPickerMenu.includes("addIcon(iconId, scaleStickerSvg(sticker.html))") &&
-      stickerPickerMenu.includes("vaultkit-sticker-preview") &&
-      stickerPickerMenu.includes("icon: registerStickerPreviewIcon(sticker)") &&
-      stickerPickerMenu.includes("scaleStickerSvg") &&
-      stickerPickerMenu.includes('scale(1.2)'),
+      stickerPickerMenu.includes("nativeStickerIcon") &&
+      stickerPickerMenu.includes('sticker.type == "lucide"') &&
+      stickerPickerMenu.includes("`lucide//${sticker.value}`") &&
+      stickerPickerMenu.includes("icon: nativeStickerIcon(sticker)") &&
+      !stickerPickerMenu.includes("registerStickerPreviewIcon") &&
+      !stickerPickerMenu.includes("addIcon("),
   },
   {
-    name: "native mobile sticker picker avoids emoji addIcon crash path",
+    name: "native mobile sticker picker keeps emoji out of native icon path",
     pass:
-      stickerPickerMenu.includes('if (sticker.type == "emoji") return null') &&
-      stickerPickerMenu.includes("stickerMenuName") &&
-      stickerPickerMenu.includes("emojiFromString(sticker.html)"),
+      stickerPickerMenu.includes("name: sticker.name") &&
+      stickerPickerMenu.includes("nativeStickerIcon(sticker)") &&
+      !stickerPickerMenu.includes("emojiFromString"),
   },
 ];
 
